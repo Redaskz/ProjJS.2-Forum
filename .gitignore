@@ -1,0 +1,72 @@
+# Binaire Go
+/forum
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Dossiers de build
+bin/
+dist/
+build/
+
+# Fichiers temporaires Go
+*.test
+*.out
+coverage.out
+
+# Dépendances locales
+vendor/
+
+# Base de données SQLite
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Fichiers d'environnement
+.env
+.env.local
+
+# Sessions et logs
+*.log
+logs/
+sessions/
+
+# Uploads utilisateurs
+uploads/
+images/uploads/
+
+# Certificats HTTPS (bonus sécurité)
+*.pem
+*.key
+*.crt
+
+# Docker
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Tests
+coverage/
+test-results/
+
+# Cache Go
+.cache/
+.gocache/
+
+# JetBrains
+out/
+
+# Fichiers temporaires
+tmp/
+temp/
