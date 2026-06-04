@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouveau post — Forum</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <main>
+        <h1>Créer un post</h1>
+        <form action="/post/create/submit" method="POST" enctype="multipart/form-data">
+            <label>Titre<input type="text" name="title" required></label>
+            <label>Contenu<textarea name="content" required></textarea></label>
+            <label>Image (optionnel)<input type="file" name="image" accept="image/*"></label>
+            <label>Catégories
+                <!-- TODO M4 : boucle sur categories -->
+                <input type="checkbox" name="categories" value="cat-1"> Général
+            </label>
+            <button type="submit">Publier</button>
+        </form>
+    </main>
+</body>
+</html>

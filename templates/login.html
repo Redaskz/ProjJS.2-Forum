@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion — Forum</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <main>
+        <h1>Connexion</h1>
+        <form action="/login/submit" method="POST">
+            <label>Email<input type="email" name="email" required></label>
+            <label>Mot de passe<input type="password" name="password" required></label>
+            <button type="submit">Se connecter</button>
+        </form>
+        <p>Pas de compte ? <a href="/register">S'inscrire</a></p>
+    </main>
+</body>
+</html>

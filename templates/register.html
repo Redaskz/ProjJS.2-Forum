@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription — Forum</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <main>
+        <h1>Inscription</h1>
+        <form action="/register/submit" method="POST">
+            <label>Email<input type="email" name="email" required></label>
+            <label>Nom d'utilisateur<input type="text" name="username" required></label>
+            <label>Mot de passe<input type="password" name="password" required></label>
+            <button type="submit">S'inscrire</button>
+        </form>
+        <p>Déjà un compte ? <a href="/login">Se connecter</a></p>
+    </main>
+</body>
+</html>
