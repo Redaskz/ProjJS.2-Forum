@@ -6,7 +6,41 @@ import (
 	"forum/middleware"
 	"log"
 	"net/http"
+	"time"
 )
+
+// loggingMiddleware affiche dans le terminal chaque requête reçue.
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		rw := &responseWriter{ResponseWriter: w, statusCode: http.StatusOK}
+		next.ServeHTTP(rw, r)
+		log.Printf("[%s] %s → %d (%s)", r.Method, r.URL.Path, rw.statusCode, time.Since(start))
+	})
+}
+
+// responseWriter wrapper pour capturer le status code HTTP.
+type responseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (rw *responseWriter) WriteHeader(code int) {
+	rw.statusCode = code
+	rw.ResponseWriter.WriteHeader(code)
+}
+
+// notFoundHandler gère les routes inconnues (404).
+func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	http.ServeFile(w, r, "templates/404.html")
+}
+
+// internalErrorHandler gère les erreurs internes (500).
+func internalErrorHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusInternalServerError)
+	http.ServeFile(w, r, "templates/500.html")
+}
 
 func main() {
 	database.Init("schema.sql")
@@ -14,7 +48,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	// Fichiers statiques (CSS, images uploadées)
+	// Fichiers statiques
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
@@ -37,9 +71,15 @@ func main() {
 	mux.HandleFunc("/comment/delete", middleware.RequireAuth(handlers.DeleteComment))
 	mux.HandleFunc("/like", middleware.RequireAuth(handlers.ToggleLike))
 
-	// Gestion d'erreurs HTTP
+	// Pages d'erreur
+	mux.HandleFunc("/404", notFoundHandler)
+	mux.HandleFunc("/500", internalErrorHandler)
+
+	// Logging sur toutes les requêtes
+	loggedMux := loggingMiddleware(mux)
+
 	log.Println("Serveur démarré sur http://localhost:8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	if err := http.ListenAndServe(":8080", loggedMux); err != nil {
 		log.Fatal(err)
 	}
 }
