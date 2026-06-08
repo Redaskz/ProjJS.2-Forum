@@ -1,13 +1,41 @@
 package handlers
 
 import (
+	"forum/database"
+	"forum/middleware"
+	"forum/models"
 	"net/http"
+	"strconv"
 )
 
-// ToggleLike gère le like/dislike sur un post ou commentaire.
-// target_type : "post" ou "comment"
-// value       : 1 (like) ou -1 (dislike)
-// TODO M3 : INSERT ou UPDATE ou DELETE dans likes selon l'état actuel
 func ToggleLike(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Non implémenté", http.StatusNotImplemented)
+	user := r.Context().Value(middleware.UserKey).(*models.User)
+
+	targetID := r.FormValue("target_id")
+	targetType := r.FormValue("target_type")
+
+	value, err := strconv.Atoi(r.FormValue("value"))
+	if err != nil || (value != 1 && value != -1) {
+		http.Error(w, "Vote invalide", http.StatusBadRequest)
+		return
+	}
+
+	err = database.ToggleLike(
+		user.ID,
+		targetID,
+		targetType,
+		value,
+	)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	back := r.Referer()
+	if back == "" {
+		back = "/"
+	}
+
+	http.Redirect(w, r, back, http.StatusSeeOther)
 }
