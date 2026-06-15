@@ -8,43 +8,268 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
-<div class="top-bar">
-
-    <!-- GAUCHE -->
-    <div class="left">
-        <a href="post.html" class="btn create">Créer une discussion</a>
+<header class="header">
+    <div class="header-stripe"></div>
+    <div class="header-inner">
+        <a href="/" class="logo">⚽ ForumFoot</a>
+        <nav class="header-nav">
+            <a href="/" class="active">Accueil</a>
+            {{if .User}}<a href="/?filter=myposts">Mes posts</a>{{end}}
+            {{if .User}}<a href="/?filter=liked">Aimés</a>{{end}}
+        </nav>
+        <div class="header-auth">
+            {{if .User}}
+                <a href="/profile" class="user-chip">
+                    <div class="avatar">
+                        {{if .User.ProfilePhoto}}
+                            <img src="/uploads/{{.User.ProfilePhoto}}" alt="">
+                        {{else}}
+                            {{slice .User.Username 0 1}}
+                        {{end}}
+                    </div>
+                    {{.User.Username}}
+                </a>
+                <a href="/post/create" class="btn btn-primary">+ Nouveau post</a>
+                <a href="/logout" class="btn btn-ghost">Déconnexion</a>
+            {{else}}
+                <a href="/login"    class="btn btn-ghost">Connexion</a>
+                <a href="/register" class="btn btn-primary">S'inscrire</a>
+            {{end}}
+        </div>
     </div>
+</header>
 
-    <!-- TITRE -->
-    <div class="title">Forum Foot</div>
+<div class="page-body">
 
-    <!-- DROITE -->
-    <div class="nav-buttons">
-        <a href="login.html" class="btn login">Se connecter</a>
-        <a href="register.html" class="btn signup">S'inscrire</a>
-    </div>
+    <!-- ── GAUCHE : MATCHS CdM 2026 ── -->
+    <aside class="sidebar-left">
+        <div class="card">
+            <div class="card-header">⚽ Coupe du Monde 2026</div>
+
+            <div class="match-group-label">Terminés</div>
+
+            <div class="match-row">
+                <div class="match-top">
+                    <span class="badge-time done">Terminé</span>
+                    <span class="match-grp-tag">Gr. A · J1</span>
+                </div>
+                <div class="match-teams">
+                    <div class="match-team"><span class="team-name">🇧🇷 Brésil</span><span class="score-val win">4</span></div>
+                    <div class="match-team"><span class="team-name">🇧🇴 Bolivie</span><span class="score-val loss">0</span></div>
+                </div>
+            </div>
+
+            <div class="match-row">
+                <div class="match-top">
+                    <span class="badge-time done">Terminé</span>
+                    <span class="match-grp-tag">Gr. B · J1</span>
+                </div>
+                <div class="match-teams">
+                    <div class="match-team"><span class="team-name">🇩🇪 Allemagne</span><span class="score-val win">3</span></div>
+                    <div class="match-team"><span class="team-name">🇨🇱 Chili</span><span class="score-val loss">1</span></div>
+                </div>
+            </div>
+
+            <div class="match-row">
+                <div class="match-top">
+                    <span class="badge-time done">Terminé</span>
+                    <span class="match-grp-tag">Gr. C · J1</span>
+                </div>
+                <div class="match-teams">
+                    <div class="match-team"><span class="team-name">🇦🇷 Argentine</span><span class="score-val win">2</span></div>
+                    <div class="match-team"><span class="team-name">🇲🇦 Maroc</span><span class="score-val loss">0</span></div>
+                </div>
+            </div>
+
+            <div class="match-group-label" style="color:#dc2626">🔴 En direct</div>
+
+            <div class="match-row">
+                <div class="match-top">
+                    <span class="badge-time live">LIVE 58'</span>
+                    <span class="match-grp-tag">Gr. H · J1</span>
+                </div>
+                <div class="match-teams">
+                    <div class="match-team"><span class="team-name">🇪🇸 Espagne</span><span class="score-val win">2</span></div>
+                    <div class="match-team"><span class="team-name">🇨🇻 Cap-Vert</span><span class="score-val loss">0</span></div>
+                </div>
+            </div>
+
+            <div class="match-row">
+                <div class="match-top">
+                    <span class="badge-time live">LIVE 31'</span>
+                    <span class="match-grp-tag">Gr. G · J1</span>
+                </div>
+                <div class="match-teams">
+                    <div class="match-team"><span class="team-name">🇧🇪 Belgique</span><span class="score-val">1</span></div>
+                    <div class="match-team"><span class="team-name">🇪🇬 Égypte</span><span class="score-val">1</span></div>
+                </div>
+            </div>
+
+            <div class="match-group-label">À venir</div>
+
+            <div class="match-row">
+                <div class="match-top">
+                    <span class="badge-time">Demain 21:00</span>
+                    <span class="match-grp-tag">Gr. I · J1</span>
+                </div>
+                <div class="match-teams">
+                    <div class="match-team"><span class="team-name">🇫🇷 France</span><span class="score-val pending">–</span></div>
+                    <div class="match-team"><span class="team-name">🇸🇳 Sénégal</span><span class="score-val pending">–</span></div>
+                </div>
+            </div>
+
+            <div class="match-row">
+                <div class="match-top">
+                    <span class="badge-time">16 Juin 18:00</span>
+                    <span class="match-grp-tag">Gr. D · J1</span>
+                </div>
+                <div class="match-teams">
+                    <div class="match-team"><span class="team-name">🇵🇹 Portugal</span><span class="score-val pending">–</span></div>
+                    <div class="match-team"><span class="team-name">🇯🇵 Japon</span><span class="score-val pending">–</span></div>
+                </div>
+            </div>
+
+            <div class="match-row">
+                <div class="match-top">
+                    <span class="badge-time">17 Juin 21:00</span>
+                    <span class="match-grp-tag">Gr. E · J1</span>
+                </div>
+                <div class="match-teams">
+                    <div class="match-team"><span class="team-name">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre</span><span class="score-val pending">–</span></div>
+                    <div class="match-team"><span class="team-name">🇺🇸 États-Unis</span><span class="score-val pending">–</span></div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ── CENTRE : POSTS ── -->
+    <main class="feed">
+        <div class="feed-topbar">
+            <div class="tabs">
+                <a href="/" class="tab active">Tous</a>
+                {{if .User}}
+                    <a href="/?filter=myposts" class="tab">Mes posts</a>
+                    <a href="/?filter=liked"   class="tab">Aimés</a>
+                {{end}}
+                {{range .Categories}}
+                    <a href="/?filter=category&id={{.ID}}" class="tab">{{.Name}}</a>
+                {{end}}
+            </div>
+            {{if .User}}
+                <a href="/post/create" class="btn btn-primary" style="flex-shrink:0">+ Post</a>
+            {{end}}
+        </div>
+
+        {{if .Posts}}
+            {{range .Posts}}
+            <div class="post-card">
+                <div class="post-head">
+                    <div class="avatar">
+                        {{slice .Username 0 1}}
+                    </div>
+                    <div class="post-meta-info">
+                        <div class="post-author">{{.Username}}</div>
+                        <div class="post-date">{{.CreatedAt.Format "02 Jan 2006 à 15:04"}}</div>
+                    </div>
+                    <div class="tags">
+                        {{range .Categories}}<span class="tag">{{.Name}}</span>{{end}}
+                    </div>
+                </div>
+
+                <a href="/post/?id={{.ID}}" class="post-title">{{.Title}}</a>
+                <div class="post-excerpt">{{.Content}}</div>
+
+                <div class="post-footer">
+                    <div class="vote-row">
+                        {{if $.User}}
+                        <form method="POST" action="/like" style="display:inline">
+                            <input type="hidden" name="target_id"   value="{{.ID}}">
+                            <input type="hidden" name="target_type" value="post">
+                            <input type="hidden" name="value"       value="1">
+                            <button type="submit" class="vote-btn {{if eq .UserVote 1}}liked{{end}}">👍 {{.Likes}}</button>
+                        </form>
+                        <form method="POST" action="/like" style="display:inline">
+                            <input type="hidden" name="target_id"   value="{{.ID}}">
+                            <input type="hidden" name="target_type" value="post">
+                            <input type="hidden" name="value"       value="-1">
+                            <button type="submit" class="vote-btn {{if eq .UserVote -1}}disliked{{end}}">👎 {{.Dislikes}}</button>
+                        </form>
+                        {{else}}
+                        <a href="/login" class="vote-btn">👍 {{.Likes}}</a>
+                        <a href="/login" class="vote-btn">👎 {{.Dislikes}}</a>
+                        {{end}}
+                    </div>
+                    <a href="/post/?id={{.ID}}" class="see-link">Lire la discussion →</a>
+                </div>
+            </div>
+            {{end}}
+        {{else}}
+            <div class="empty-state">
+                <div class="empty-icon">💬</div>
+                <p style="font-weight:700;margin-bottom:6px">Aucun post pour le moment</p>
+                <p style="font-size:0.83rem">Sois le premier à lancer une discussion !</p>
+                {{if .User}}
+                    <a href="/post/create" class="btn btn-primary" style="margin-top:1.25rem">Créer le premier post</a>
+                {{else}}
+                    <a href="/register" class="btn btn-primary" style="margin-top:1.25rem">Rejoindre le forum</a>
+                {{end}}
+            </div>
+        {{end}}
+    </main>
+
+    <!-- ── DROITE : ACTUALITÉS ── -->
+    <aside class="sidebar-right">
+        <div class="card">
+            <div class="card-header">📰 Actualités foot</div>
+            <div class="news-item">
+                <span class="news-badge nb-live">Live</span>
+                <div class="news-title">Espagne 2-0 Cap-Vert — Yamal auteur d'un doublé à la 58e</div>
+                <div class="news-src">RMC Sport · En direct</div>
+            </div>
+            <div class="news-item">
+                <span class="news-badge nb-result">Résultat</span>
+                <div class="news-title">Brésil 4-0 Bolivie — Vinicius Jr. intouchable à l'ouverture</div>
+                <div class="news-src">L'Équipe · il y a 2h</div>
+            </div>
+            <div class="news-item">
+                <span class="news-badge nb-actu">CdM 2026</span>
+                <div class="news-title">Mbappé : "Je veux gagner ce Mondial pour la France"</div>
+                <div class="news-src">Le Parisien · il y a 5h</div>
+            </div>
+            <div class="news-item">
+                <span class="news-badge nb-trans">Transfert</span>
+                <div class="news-title">Real Madrid : Haaland priorité absolue cet été</div>
+                <div class="news-src">Marca · il y a 8h</div>
+            </div>
+            <div class="news-item">
+                <span class="news-badge nb-actu">CdM 2026</span>
+                <div class="news-title">Ronaldo : "Ce Mondial sera mon dernier, je veux finir en beauté"</div>
+                <div class="news-src">Record · il y a 12h</div>
+            </div>
+            <div class="news-item">
+                <span class="news-badge nb-result">Résultat</span>
+                <div class="news-title">Argentine 2-0 Maroc — Messi décisif dès la 1re journée</div>
+                <div class="news-src">ESPN · il y a 14h</div>
+            </div>
+            <div class="news-item">
+                <span class="news-badge nb-trans">Transfert</span>
+                <div class="news-title">PSG : accord trouvé avec Osimhen, annonce imminente</div>
+                <div class="news-src">Foot Mercato · il y a 1j</div>
+            </div>
+        </div>
+
+        {{if not .User}}
+        <div class="card" style="padding:1.25rem">
+            <p style="font-weight:800;font-size:0.9rem;margin-bottom:6px">Rejoins la communauté 🔥</p>
+            <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Commente, vote et partage ton avis sur le foot.</p>
+            <div style="display:flex;flex-direction:column;gap:6px">
+                <a href="/register" class="btn btn-primary" style="justify-content:center">S'inscrire gratuitement</a>
+                <a href="/login"    class="btn btn-ghost"   style="justify-content:center">Se connecter</a>
+            </div>
+        </div>
+        {{end}}
+    </aside>
 
 </div>
-
-<!-- CATEGORIES -->
-<div class="category-bar">
-
-    <a href="index.html" class="cat active">Général</a>
-    <a href="ligue1.html" class="cat">Ligue 1</a>
-    <a href="premier-league.html" class="cat">Premier League</a>
-    <a href="la-liga.html" class="cat">La Liga</a>
-    <a href="serie-a.html" class="cat">Serie A</a>
-    <a href="autres.html" class="cat">Autres</a>
-
-</div>
-
-<!-- FIL D'ACTUALITÉS -->
-<div class="feed-title">Fil d’actualités</div>
-
-
-
-</div>
-
 </body>
 </html>

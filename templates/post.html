@@ -3,50 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer une discussion</title>
+    <title>{{.Post.Title}} — ForumFoot</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
-<!-- RETOUR -->
-<a href="index.html" class="back-btn">← Retour</a>
+<header class="header">
+    <div class="header-stripe"></div>
+    <div class="header-inner">
+        <a href="/" class="logo">⚽ ForumFoot</a>
+        <nav class="header-nav"><a href="/">Accueil</a></nav>
+        <div class="header-auth">
+            {{if .User}}
+                <a href="/profile" class="user-chip">
+                    <div class="avatar">
+                        {{if .User.ProfilePhoto}}<img src="/uploads/{{.User.ProfilePhoto}}" alt="">{{else}}{{slice .User.Username 0 1}}{{end}}
+                    </div>
+                    {{.User.Username}}
+                </a>
+                <a href="/post/create" class="btn btn-primary">+ Nouveau post</a>
+                <a href="/logout" class="btn btn-ghost">Déconnexion</a>
+            {{else}}
+                <a href="/login"    class="btn btn-ghost">Connexion</a>
+                <a href="/register" class="btn btn-primary">S'inscrire</a>
+            {{end}}
+        </div>
+    </div>
+</header>
 
-<!-- FORMULAIRE -->
-<div class="create-container">
+<div class="detail-wrap">
 
-    <h1>Créer une discussion</h1>
+    <a href="/" class="back-link">← Retour aux discussions</a>
 
-    <form>
-
-        <div class="input-group">
-            <label>Titre</label>
-            <input type="text" placeholder="Titre de la discussion">
+    <div class="post-detail">
+        <div class="post-detail-head">
+            <div class="avatar">{{slice .Post.Username 0 1}}</div>
+            <div>
+                <div class="post-author" style="font-weight:700;color:var(--red);font-size:0.85rem">{{.Post.Username}}</div>
+                <div style="font-size:0.72rem;color:var(--muted)">{{.Post.CreatedAt.Format "02 Jan 2006 à 15:04"}}</div>
+            </div>
+            <div class="tags" style="margin-left:auto">
+                {{range .Post.Categories}}<span class="tag">{{.Name}}</span>{{end}}
+            </div>
         </div>
 
-        <div class="input-group">
-            <label>Catégorie</label>
-            <select>
-                <option>Général</option>
-                <option>Ligue 1</option>
-                <option>Premier League</option>
-                <option>La Liga</option>
-                <option>Serie A</option>
-                <option>Autres</option>
-            </select>
+        <h1 class="post-detail-title">{{.Post.Title}}</h1>
+
+        {{if .Post.ImagePath}}
+            <img src="/uploads/{{.Post.ImagePath}}" alt="" class="post-image">
+        {{end}}
+
+        <p class="post-content">{{.Post.Content}}</p>
+
+        <div class="post-actions">
+            {{if .User}}
+                <form method="POST" action="/like">
+                    <input type="hidden" name="target_id"   value="{{.Post.ID}}">
+                    <input type="hidden" name="target_type" value="post">
+                    <input type="hidden" name="value"       value="1">
+                    <button type="submit" class="vote-btn {{if eq .Post.UserVote 1}}liked{{end}}">👍 {{.Post.Likes}}</button>
+                </form>
+                <form method="POST" action="/like">
+                    <input type="hidden" name="target_id"   value="{{.Post.ID}}">
+                    <input type="hidden" name="target_type" value="post">
+                    <input type="hidden" name="value"       value="-1">
+                    <button type="submit" class="vote-btn {{if eq .Post.UserVote -1}}disliked{{end}}">👎 {{.Post.Dislikes}}</button>
+                </form>
+
+                {{if eq .User.ID .Post.UserID}}
+                    <details>
+                        <summary class="btn btn-edit">✏️ Modifier</summary>
+                        <div class="edit-panel">
+                            <form method="POST" action="/post/update" style="display:flex;flex-direction:column;gap:0.75rem">
+                                <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                                <div class="form-group">
+                                    <label class="form-label">Titre</label>
+                                    <input type="text" name="title" value="{{.Post.Title}}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Contenu</label>
+                                    <textarea name="content" required>{{.Post.Content}}</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-save">Sauvegarder</button>
+                            </form>
+                        </div>
+                    </details>
+                    <form method="POST" action="/post/delete">
+                        <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                        <button type="submit" class="btn btn-danger">🗑 Supprimer</button>
+                    </form>
+                {{end}}
+            {{else}}
+                <span class="vote-btn">👍 {{.Post.Likes}}</span>
+                <span class="vote-btn">👎 {{.Post.Dislikes}}</span>
+                <a href="/login" class="btn btn-ghost" style="font-size:0.8rem">Connecte-toi pour voter</a>
+            {{end}}
         </div>
+    </div>
 
-        <div class="input-group">
-            <label>Contenu</label>
-            <textarea placeholder="Écris ta discussion..."></textarea>
+    <!-- COMMENTAIRES -->
+    <div class="section-title">{{len .Comments}} commentaire{{if gt (len .Comments) 1}}s{{end}}</div>
+
+    {{if .User}}
+    <div class="reply-box">
+        <form method="POST" action="/comment/create" style="display:flex;flex-direction:column;gap:0.75rem">
+            <input type="hidden" name="post_id" value="{{.Post.ID}}">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+                <div class="avatar" style="margin-top:2px">{{slice .User.Username 0 1}}</div>
+                <div style="flex:1">
+                    <textarea name="content" placeholder="Ajoute un commentaire..." required style="min-height:80px"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="align-self:flex-end">Commenter</button>
+        </form>
+    </div>
+    {{else}}
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;margin-bottom:1rem">
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem">Connecte-toi pour laisser un commentaire</p>
+        <div style="display:flex;gap:8px;justify-content:center">
+            <a href="/login"    class="btn btn-ghost">Connexion</a>
+            <a href="/register" class="btn btn-primary">S'inscrire</a>
         </div>
+    </div>
+    {{end}}
 
-        <button type="submit" class="create-btn">
-            Publier
-        </button>
+    {{range .Comments}}
+    <div class="comment">
+        <div class="comment-head">
+            <div class="avatar" style="width:28px;height:28px;font-size:0.75rem">{{slice .Username 0 1}}</div>
+            <div class="comment-meta">
+                <div class="comment-author">{{.Username}}</div>
+                <div class="comment-date">{{.CreatedAt.Format "02 Jan 2006 à 15:04"}}</div>
+            </div>
+        </div>
+        <p class="comment-body">{{.Content}}</p>
+        <div class="comment-footer">
+            <div class="vote-row">
+                {{if $.User}}
+                <form method="POST" action="/like" style="display:inline">
+                    <input type="hidden" name="target_id"   value="{{.ID}}">
+                    <input type="hidden" name="target_type" value="comment">
+                    <input type="hidden" name="value"       value="1">
+                    <button type="submit" class="vote-btn {{if eq .UserVote 1}}liked{{end}}">👍 {{.Likes}}</button>
+                </form>
+                <form method="POST" action="/like" style="display:inline">
+                    <input type="hidden" name="target_id"   value="{{.ID}}">
+                    <input type="hidden" name="target_type" value="comment">
+                    <input type="hidden" name="value"       value="-1">
+                    <button type="submit" class="vote-btn {{if eq .UserVote -1}}disliked{{end}}">👎 {{.Dislikes}}</button>
+                </form>
+                {{else}}
+                    <span class="vote-btn">👍 {{.Likes}}</span>
+                    <span class="vote-btn">👎 {{.Dislikes}}</span>
+                {{end}}
+            </div>
+            {{if $.User}}{{if eq $.User.ID .UserID}}
+            <div style="display:flex;gap:5px">
+                <details>
+                    <summary class="btn btn-edit">Modifier</summary>
+                    <div class="edit-panel">
+                        <form method="POST" action="/comment/update" style="display:flex;flex-direction:column;gap:0.5rem">
+                            <input type="hidden" name="comment_id" value="{{.ID}}">
+                            <textarea name="content" required style="min-height:60px">{{.Content}}</textarea>
+                            <button type="submit" class="btn btn-save" style="align-self:flex-start">Sauvegarder</button>
+                        </form>
+                    </div>
+                </details>
+                <form method="POST" action="/comment/delete">
+                    <input type="hidden" name="comment_id" value="{{.ID}}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+            {{end}}{{end}}
+        </div>
+    </div>
+    {{end}}
 
-    </form>
+    {{if not .Comments}}
+    <div class="empty-state" style="padding:2.5rem">
+        <div class="empty-icon">💬</div>
+        <p>Aucun commentaire — lance la conversation !</p>
+    </div>
+    {{end}}
 
 </div>
-
 </body>
 </html>

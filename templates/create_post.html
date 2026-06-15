@@ -2,22 +2,76 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Nouveau post — Forum</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveau post — ForumFoot</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <main>
-        <h1>Créer un post</h1>
-        <form action="/post/create/submit" method="POST" enctype="multipart/form-data">
-            <label>Titre<input type="text" name="title" required></label>
-            <label>Contenu<textarea name="content" required></textarea></label>
-            <label>Image (optionnel)<input type="file" name="image" accept="image/*"></label>
-            <label>Catégories
-                <!-- TODO M4 : boucle sur categories -->
-                <input type="checkbox" name="categories" value="cat-1"> Général
-            </label>
-            <button type="submit">Publier</button>
-        </form>
-    </main>
+
+<header class="header">
+    <div class="header-stripe"></div>
+    <div class="header-inner">
+        <a href="/" class="logo">⚽ ForumFoot</a>
+        <div class="header-auth">
+            {{if .User}}
+                <a href="/profile" class="user-chip">
+                    <div class="avatar">
+                        {{if .User.ProfilePhoto}}<img src="/uploads/{{.User.ProfilePhoto}}" alt="">{{else}}{{slice .User.Username 0 1}}{{end}}
+                    </div>
+                    {{.User.Username}}
+                </a>
+                <a href="/logout" class="btn btn-ghost">Déconnexion</a>
+            {{end}}
+        </div>
+    </div>
+</header>
+
+<div class="create-page">
+    <div class="create-wrap">
+        <a href="/" class="back-link">← Retour</a>
+
+        <div class="create-box">
+            <div class="create-title">✍️ Créer une discussion</div>
+
+            {{if eq .Error "format_non_supporte"}}
+            <div class="alert alert-error">Format non supporté. Utilise JPG, PNG, GIF ou WebP (20 Mo max).</div>
+            {{end}}
+
+            <form action="/post/create/submit" method="POST" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:1rem">
+
+                <div class="form-group">
+                    <label class="form-label">Titre</label>
+                    <input type="text" name="title" placeholder="De quoi veux-tu parler ?" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Contenu</label>
+                    <textarea name="content" placeholder="Développe ton sujet, partage ton avis..." required style="min-height:180px"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Image (optionnel)</label>
+                    <input type="file" name="image" accept="image/*">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Catégories</label>
+                    <div class="checkbox-group">
+                        {{range .Categories}}
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="categories" value="{{.ID}}">
+                            {{.Name}}
+                        </label>
+                        {{end}}
+                    </div>
+                </div>
+
+                <button type="submit" class="create-submit">Publier la discussion</button>
+
+            </form>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
