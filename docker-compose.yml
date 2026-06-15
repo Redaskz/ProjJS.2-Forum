@@ -1,0 +1,15 @@
+services:
+  forum:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads_data:/app/uploads
+      - db_data:/app/data
+    environment:
+      - DB_PATH=./forum.db
+    restart: unless-stopped
+
+volumes:
+  uploads_data:
+  db_data:

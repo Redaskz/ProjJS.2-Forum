@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-// CreateUser insère un nouvel utilisateur en BDD.
-// Le mot de passe doit déjà être hashé avec bcrypt avant d'appeler cette fonction.
 func CreateUser(email, username, passwordHash string) (*models.User, error) {
 	user := &models.User{
 		ID:           utils.NewID(),
@@ -30,22 +28,15 @@ func CreateUser(email, username, passwordHash string) (*models.User, error) {
 	return user, nil
 }
 
-// GetUserByEmail récupère un utilisateur par son email.
-// Utilisé lors de la connexion pour vérifier les credentials.
-// Retourne sql.ErrNoRows si l'email n'existe pas.
 func GetUserByEmail(email string) (*models.User, error) {
 	user := &models.User{}
 
 	err := DB.QueryRow(`
-		SELECT id, email, username, password_hash, created_at
-		FROM users
-		WHERE email = ?
+		SELECT id, email, username, password_hash, COALESCE(profile_photo, ''), created_at
+		FROM users WHERE email = ?
 	`, email).Scan(
-		&user.ID,
-		&user.Email,
-		&user.Username,
-		&user.PasswordHash,
-		&user.CreatedAt,
+		&user.ID, &user.Email, &user.Username,
+		&user.PasswordHash, &user.ProfilePhoto, &user.CreatedAt,
 	)
 
 	if err == sql.ErrNoRows {
@@ -58,20 +49,15 @@ func GetUserByEmail(email string) (*models.User, error) {
 	return user, nil
 }
 
-// GetUserByID récupère un utilisateur par son ID.
-// Utilisé par le middleware de session.
 func GetUserByID(id string) (*models.User, error) {
 	user := &models.User{}
 
 	err := DB.QueryRow(`
-		SELECT id, email, username, created_at
-		FROM users
-		WHERE id = ?
+		SELECT id, email, username, COALESCE(profile_photo, ''), created_at
+		FROM users WHERE id = ?
 	`, id).Scan(
-		&user.ID,
-		&user.Email,
-		&user.Username,
-		&user.CreatedAt,
+		&user.ID, &user.Email, &user.Username,
+		&user.ProfilePhoto, &user.CreatedAt,
 	)
 
 	if err == sql.ErrNoRows {
@@ -82,4 +68,14 @@ func GetUserByID(id string) (*models.User, error) {
 	}
 
 	return user, nil
+}
+
+func UpdatePassword(userID, hashedPassword string) error {
+	_, err := DB.Exec(`UPDATE users SET password_hash = ? WHERE id = ?`, hashedPassword, userID)
+	return err
+}
+
+func UpdateProfilePhoto(userID, photoPath string) error {
+	_, err := DB.Exec(`UPDATE users SET profile_photo = ? WHERE id = ?`, photoPath, userID)
+	return err
 }

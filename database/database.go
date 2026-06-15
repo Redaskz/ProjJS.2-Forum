@@ -30,6 +30,9 @@ func Init(schemaPath string) {
 		log.Fatal("Erreur exécution schema.sql:", err)
 	}
 
+	// Migration : ajout colonne profile_photo (échoue silencieusement si déjà présente)
+	DB.Exec(`ALTER TABLE users ADD COLUMN profile_photo TEXT NOT NULL DEFAULT ''`)
+
 	log.Println("Base de données initialisée")
 }
 

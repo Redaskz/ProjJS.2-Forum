@@ -13,6 +13,7 @@ func ShowRegister(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "templates/register.html")
 }
 
+
 // Register traite la soumission du formulaire d'inscription.
 func Register(w http.ResponseWriter, r *http.Request) {
 	// Accepter uniquement les requêtes POST

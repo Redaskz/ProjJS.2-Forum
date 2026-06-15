@@ -71,6 +71,11 @@ func main() {
 	mux.HandleFunc("/comment/delete", middleware.RequireAuth(handlers.DeleteComment))
 	mux.HandleFunc("/like", middleware.RequireAuth(handlers.ToggleLike))
 
+	// Profil utilisateur
+	mux.HandleFunc("/profile", middleware.RequireAuth(handlers.ShowProfile))
+	mux.HandleFunc("/profile/password", middleware.RequireAuth(handlers.ChangePassword))
+	mux.HandleFunc("/profile/photo", middleware.RequireAuth(handlers.UploadProfilePhoto))
+
 	// Pages d'erreur
 	mux.HandleFunc("/404", notFoundHandler)
 	mux.HandleFunc("/500", internalErrorHandler)

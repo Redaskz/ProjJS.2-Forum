@@ -24,11 +24,11 @@ func GetUserFromSession(r *http.Request) *models.User {
 	var expiresAt time.Time
 
 	err = database.DB.QueryRow(`
-		SELECT u.id, u.email, u.username, s.expires_at
+		SELECT u.id, u.email, u.username, COALESCE(u.profile_photo, ''), s.expires_at
 		FROM sessions s
 		JOIN users u ON u.id = s.user_id
 		WHERE s.id = ?
-	`, cookie.Value).Scan(&user.ID, &user.Email, &user.Username, &expiresAt)
+	`, cookie.Value).Scan(&user.ID, &user.Email, &user.Username, &user.ProfilePhoto, &expiresAt)
 
 	if err != nil {
 		return nil

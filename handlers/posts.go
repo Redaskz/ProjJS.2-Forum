@@ -4,8 +4,13 @@ import (
 	"forum/database"
 	"forum/middleware"
 	"forum/models"
+	"forum/utils"
 	"html/template"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 func ListPosts(w http.ResponseWriter, r *http.Request) {
@@ -118,24 +123,52 @@ func ShowPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func ShowCreatePost(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "templates/create_post.html")
+	user := r.Context().Value(middleware.UserKey).(*models.User)
+	categories, _ := database.GetAllCategories()
+
+	data := struct {
+		User       *models.User
+		Categories []models.Category
+		Error      string
+	}{
+		User:       user,
+		Categories: categories,
+		Error:      r.URL.Query().Get("error"),
+	}
+
+	tmpl := template.Must(template.ParseFiles("templates/create_post.html"))
+	tmpl.Execute(w, data)
 }
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(middleware.UserKey).(*models.User)
 
+	r.ParseMultipartForm(20 << 20) // 20 Mo max
+
 	title := r.FormValue("title")
 	content := r.FormValue("content")
 	categoryIDs := r.Form["categories"]
 
-	_, err := database.CreatePost(
-		user.ID,
-		title,
-		content,
-		"",
-		categoryIDs,
-	)
+	imagePath := ""
+	file, handler, err := r.FormFile("image")
+	if err == nil {
+		defer file.Close()
+		ext := strings.ToLower(filepath.Ext(handler.Filename))
+		if ext != ".jpg" && ext != ".jpeg" && ext != ".png" && ext != ".gif" && ext != ".webp" {
+			http.Redirect(w, r, "/post/create?error=format_non_supporte", http.StatusSeeOther)
+			return
+		}
+		os.MkdirAll("uploads", 0755)
+		filename := utils.NewID() + ext
+		dst, err := os.Create("uploads/" + filename)
+		if err == nil {
+			io.Copy(dst, file)
+			dst.Close()
+			imagePath = filename
+		}
+	}
 
+	_, err = database.CreatePost(user.ID, title, content, imagePath, categoryIDs)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
