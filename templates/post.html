@@ -2,15 +2,51 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Post — Forum</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer une discussion</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav><a href="/">← Retour</a></nav>
-    </header>
-    <main>
-        <!-- TODO M4 : afficher post + commentaires + likes -->
-    </main>
+
+<!-- RETOUR -->
+<a href="index.html" class="back-btn">← Retour</a>
+
+<!-- FORMULAIRE -->
+<div class="create-container">
+
+    <h1>Créer une discussion</h1>
+
+    <form>
+
+        <div class="input-group">
+            <label>Titre</label>
+            <input type="text" placeholder="Titre de la discussion">
+        </div>
+
+        <div class="input-group">
+            <label>Catégorie</label>
+            <select>
+                <option>Général</option>
+                <option>Ligue 1</option>
+                <option>Premier League</option>
+                <option>La Liga</option>
+                <option>Serie A</option>
+                <option>Autres</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Contenu</label>
+            <textarea placeholder="Écris ta discussion..."></textarea>
+        </div>
+
+        <button type="submit" class="create-btn">
+            Publier
+        </button>
+
+    </form>
+
+</div>
+
 </body>
 </html>

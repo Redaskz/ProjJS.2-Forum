@@ -2,18 +2,39 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Connexion — Forum</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main>
-        <h1>Connexion</h1>
-        <form action="/login/submit" method="POST">
-            <label>Email<input type="email" name="email" required></label>
-            <label>Mot de passe<input type="password" name="password" required></label>
-            <button type="submit">Se connecter</button>
-        </form>
-        <p>Pas de compte ? <a href="/register">S'inscrire</a></p>
-    </main>
+
+<a href="index.html" class="back-btn">← Retour</a>
+
+<div class="login-container">
+
+    <h1>Connexion</h1>
+
+    <form>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" placeholder="email@mail.com">
+        </div>
+
+        <div class="input-group">
+            <label>Mot de passe</label>
+            <input type="password" placeholder="••••••••">
+        </div>
+
+        <button class="login-btn" type="submit">Se connecter</button>
+
+    </form>
+
+    <p style="text-align:center;margin-top:15px;">
+        Pas de compte ? <a href="register.html">S'inscrire</a>
+    </p>
+
+</div>
+
 </body>
 </html>
