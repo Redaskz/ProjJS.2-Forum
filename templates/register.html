@@ -2,19 +2,49 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Inscription — Forum</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main>
-        <h1>Inscription</h1>
-        <form action="/register/submit" method="POST">
-            <label>Email<input type="email" name="email" required></label>
-            <label>Nom d'utilisateur<input type="text" name="username" required></label>
-            <label>Mot de passe<input type="password" name="password" required></label>
-            <button type="submit">S'inscrire</button>
-        </form>
-        <p>Déjà un compte ? <a href="/login">Se connecter</a></p>
-    </main>
+
+<a href="index.html" class="back-btn">← Retour</a>
+
+<div class="register-container">
+
+    <h1>Créer un compte</h1>
+
+    <form>
+
+        <div class="input-group">
+            <label>Nom d'utilisateur</label>
+            <input type="text" placeholder="Pseudo">
+        </div>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" placeholder="email@mail.com">
+        </div>
+
+        <div class="input-group">
+            <label>Mot de passe</label>
+            <input type="password" placeholder="••••••••">
+        </div>
+
+        <div class="input-group">
+            <label>Confirmer</label>
+            <input type="password" placeholder="••••••••">
+        </div>
+
+        <button class="register-btn" type="submit">S'inscrire</button>
+
+    </form>
+
+    <p style="text-align:center;margin-top:15px;">
+        Déjà inscrit ? <a href="login.html">Se connecter</a>
+    </p>
+
+</div>
+
 </body>
 </html>
