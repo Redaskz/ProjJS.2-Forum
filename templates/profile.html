@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon profil — ForumFoot</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-stripe"></div>
+    <div class="header-inner">
+        <a href="/" class="logo">⚽ ForumFoot</a>
+        <nav class="header-nav">
+            <a href="/">Accueil</a>
+        </nav>
+        <div class="header-auth">
+            <a href="/profile" class="user-chip">
+                <div class="avatar">
+                    {{if .User.ProfilePhoto}}
+                        <img src="/uploads/{{.User.ProfilePhoto}}" alt="">
+                    {{else}}
+                        {{slice .User.Username 0 1}}
+                    {{end}}
+                </div>
+                {{.User.Username}}
+            </a>
+            <a href="/logout" class="btn btn-ghost">Déconnexion</a>
+        </div>
+    </div>
+</header>
+
+<div class="profile-wrap">
+
+    <a href="/" class="back-link">← Retour à l'accueil</a>
+
+    {{if .Success}}
+        {{if eq .Success "mot_de_passe_modifie"}}
+            <div class="alert alert-success">✅ Mot de passe modifié avec succès.</div>
+        {{end}}
+        {{if eq .Success "photo_mise_a_jour"}}
+            <div class="alert alert-success">✅ Photo de profil mise à jour.</div>
+        {{end}}
+    {{end}}
+
+    {{if .Error}}
+        {{if eq .Error "mot_de_passe_incorrect"}}
+            <div class="alert alert-error">❌ Mot de passe actuel incorrect.</div>
+        {{end}}
+        {{if eq .Error "mot_de_passe_trop_court"}}
+            <div class="alert alert-error">❌ Le nouveau mot de passe doit faire au moins 6 caractères.</div>
+        {{end}}
+        {{if eq .Error "champs_vides"}}
+            <div class="alert alert-error">❌ Tous les champs sont obligatoires.</div>
+        {{end}}
+        {{if eq .Error "format_non_supporte"}}
+            <div class="alert alert-error">❌ Format non supporté. Utilise JPG, PNG, GIF ou WebP.</div>
+        {{end}}
+        {{if eq .Error "erreur_serveur"}}
+            <div class="alert alert-error">❌ Une erreur est survenue. Réessaie.</div>
+        {{end}}
+    {{end}}
+
+    <!-- Carte profil -->
+    <div class="profile-card">
+        <div class="profile-banner"></div>
+        <div class="profile-info">
+            <div class="profile-avatar-wrap">
+                <div class="avatar-lg">
+                    {{if .User.ProfilePhoto}}
+                        <img src="/uploads/{{.User.ProfilePhoto}}" alt="">
+                    {{else}}
+                        {{slice .User.Username 0 1}}
+                    {{end}}
+                </div>
+                <a href="/post/create" class="btn btn-primary">+ Nouveau post</a>
+            </div>
+            <div class="profile-name">{{.User.Username}}</div>
+            <div class="profile-email">{{.User.Email}}</div>
+        </div>
+    </div>
+
+    <!-- Changer la photo -->
+    <div class="profile-section">
+        <div class="profile-section-title">📷 Photo de profil</div>
+        <div class="profile-section-body">
+            <form action="/profile/photo" method="POST" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:0.75rem">
+                <div class="form-group">
+                    <label class="form-label">Nouvelle photo</label>
+                    <input type="file" name="photo" accept="image/*" required>
+                    <span style="font-size:0.72rem;color:var(--muted)">Formats acceptés : JPG, PNG, GIF, WebP — max 10 Mo</span>
+                </div>
+                <button type="submit" class="btn btn-primary" style="align-self:flex-start">Mettre à jour la photo</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Changer le mot de passe -->
+    <div class="profile-section">
+        <div class="profile-section-title">🔒 Changer le mot de passe</div>
+        <div class="profile-section-body">
+            <form action="/profile/password" method="POST" style="display:flex;flex-direction:column;gap:0.9rem">
+                <div class="form-group">
+                    <label class="form-label">Mot de passe actuel</label>
+                    <input type="password" name="current_password" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nouveau mot de passe</label>
+                    <input type="password" name="new_password" placeholder="••••••••" required minlength="6">
+                    <span style="font-size:0.72rem;color:var(--muted)">Minimum 6 caractères</span>
+                </div>
+                <button type="submit" class="btn btn-primary" style="align-self:flex-start">Changer le mot de passe</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Déconnexion -->
+    <div class="profile-section">
+        <div class="profile-section-title">⚙️ Compte</div>
+        <div class="profile-section-body">
+            <p style="font-size:0.83rem;color:var(--muted);margin-bottom:0.75rem">
+                Connecté en tant que <strong style="color:var(--text)">{{.User.Username}}</strong> — {{.User.Email}}
+            </p>
+            <a href="/logout" class="btn btn-danger">Se déconnecter</a>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
