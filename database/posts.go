@@ -49,7 +49,7 @@ func CreatePost(userID, title, content, imagePath string, categoryIDs []string) 
 // GetAllPosts récupère tous les posts avec leur auteur et leurs catégories.
 func GetAllPosts(userID string) ([]models.Post, error) {
 	rows, err := DB.Query(`
-		SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at,
+		SELECT p.id, p.user_id, u.username, COALESCE(u.profile_photo, ''), p.title, p.content, p.image_path, p.created_at,
 			COALESCE(SUM(CASE WHEN l.value = 1 THEN 1 ELSE 0 END), 0) as likes,
 			COALESCE(SUM(CASE WHEN l.value = -1 THEN 1 ELSE 0 END), 0) as dislikes
 		FROM posts p
@@ -69,7 +69,7 @@ func GetAllPosts(userID string) ([]models.Post, error) {
 // GetPostsByCategory récupère les posts d'une catégorie donnée.
 func GetPostsByCategory(categoryID, userID string) ([]models.Post, error) {
 	rows, err := DB.Query(`
-		SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at,
+		SELECT p.id, p.user_id, u.username, COALESCE(u.profile_photo, ''), p.title, p.content, p.image_path, p.created_at,
 			COALESCE(SUM(CASE WHEN l.value = 1 THEN 1 ELSE 0 END), 0) as likes,
 			COALESCE(SUM(CASE WHEN l.value = -1 THEN 1 ELSE 0 END), 0) as dislikes
 		FROM posts p
@@ -91,7 +91,7 @@ func GetPostsByCategory(categoryID, userID string) ([]models.Post, error) {
 // GetPostsByUser récupère les posts créés par un utilisateur.
 func GetPostsByUser(authorID, userID string) ([]models.Post, error) {
 	rows, err := DB.Query(`
-		SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at,
+		SELECT p.id, p.user_id, u.username, COALESCE(u.profile_photo, ''), p.title, p.content, p.image_path, p.created_at,
 			COALESCE(SUM(CASE WHEN l.value = 1 THEN 1 ELSE 0 END), 0) as likes,
 			COALESCE(SUM(CASE WHEN l.value = -1 THEN 1 ELSE 0 END), 0) as dislikes
 		FROM posts p
@@ -112,7 +112,7 @@ func GetPostsByUser(authorID, userID string) ([]models.Post, error) {
 // GetLikedPostsByUser récupère les posts aimés par un utilisateur.
 func GetLikedPostsByUser(userID string) ([]models.Post, error) {
 	rows, err := DB.Query(`
-		SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at,
+		SELECT p.id, p.user_id, u.username, COALESCE(u.profile_photo, ''), p.title, p.content, p.image_path, p.created_at,
 			COALESCE(SUM(CASE WHEN l.value = 1 THEN 1 ELSE 0 END), 0) as likes,
 			COALESCE(SUM(CASE WHEN l.value = -1 THEN 1 ELSE 0 END), 0) as dislikes
 		FROM posts p
@@ -138,7 +138,7 @@ func GetPostByID(postID, userID string) (*models.Post, error) {
 	post := &models.Post{}
 
 	err := DB.QueryRow(`
-		SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at,
+		SELECT p.id, p.user_id, u.username, COALESCE(u.profile_photo, ''), p.title, p.content, p.image_path, p.created_at,
 			COALESCE(SUM(CASE WHEN l.value = 1 THEN 1 ELSE 0 END), 0) as likes,
 			COALESCE(SUM(CASE WHEN l.value = -1 THEN 1 ELSE 0 END), 0) as dislikes
 		FROM posts p
@@ -147,7 +147,7 @@ func GetPostByID(postID, userID string) (*models.Post, error) {
 		WHERE p.id = ?
 		GROUP BY p.id
 	`, postID).Scan(
-		&post.ID, &post.UserID, &post.Username,
+		&post.ID, &post.UserID, &post.Username, &post.AuthorPhoto,
 		&post.Title, &post.Content, &post.ImagePath,
 		&post.CreatedAt, &post.Likes, &post.Dislikes,
 	)
@@ -245,7 +245,7 @@ func scanPosts(rows *sql.Rows, userID string) ([]models.Post, error) {
 	for rows.Next() {
 		var p models.Post
 		err := rows.Scan(
-			&p.ID, &p.UserID, &p.Username,
+			&p.ID, &p.UserID, &p.Username, &p.AuthorPhoto,
 			&p.Title, &p.Content, &p.ImagePath,
 			&p.CreatedAt, &p.Likes, &p.Dislikes,
 		)

@@ -14,6 +14,12 @@ import (
 )
 
 func ListPosts(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		w.WriteHeader(http.StatusNotFound)
+		http.ServeFile(w, r, "templates/404.html")
+		return
+	}
+
 	var currentUser *models.User
 
 	if u := r.Context().Value(middleware.UserKey); u != nil {

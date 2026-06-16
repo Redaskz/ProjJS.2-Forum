@@ -62,7 +62,5 @@ CREATE TABLE IF NOT EXISTS likes (
 
 INSERT OR IGNORE INTO categories (id, name) VALUES
     ('cat-1', 'Général'),
-    ('cat-2', 'Technologie'),
     ('cat-3', 'Sport'),
-    ('cat-4', 'Culture'),
     ('cat-5', 'Humour');
