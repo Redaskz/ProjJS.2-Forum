@@ -22,6 +22,7 @@
         <div class="dropdown-menu">
           <a href="/profile">Mon profil</a>
           <a href="/post/create">Nouveau post</a>
+          {{if eq .User.Role "admin"}}<a href="/admin">Administration</a>{{end}}
           <div class="dropdown-divider"></div>
           <a href="/logout" class="danger">Déconnexion</a>
         </div>
@@ -140,10 +141,14 @@
             </a>
 
             {{if $.User}}
-              {{if eq $.User.ID .UserID}}
+              {{$isOwner := eq $.User.ID .UserID}}
+              {{$isMod := or (eq $.User.Role "moderator") (eq $.User.Role "admin")}}
+              {{if or $isOwner $isMod}}
               <div class="post-actions">
+                {{if $isOwner}}
                 <a href="/post/?id={{.ID}}" class="btn btn-ghost btn-sm" title="Options du post" style="padding:5px 8px">⚙</a>
                 <a href="/post/?id={{.ID}}" class="btn btn-ghost btn-sm">Modifier</a>
+                {{end}}
                 <form action="/post/delete" method="POST" style="display:inline">
                   <input type="hidden" name="post_id" value="{{.ID}}">
                   <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>

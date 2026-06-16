@@ -24,11 +24,11 @@ func GetUserFromSession(r *http.Request) *models.User {
 	var expiresAt time.Time
 
 	err = database.DB.QueryRow(`
-		SELECT u.id, u.email, u.username, COALESCE(u.profile_photo, ''), s.expires_at
+		SELECT u.id, u.email, u.username, COALESCE(u.role,'user'), COALESCE(u.profile_photo, ''), s.expires_at
 		FROM sessions s
 		JOIN users u ON u.id = s.user_id
 		WHERE s.id = ?
-	`, cookie.Value).Scan(&user.ID, &user.Email, &user.Username, &user.ProfilePhoto, &expiresAt)
+	`, cookie.Value).Scan(&user.ID, &user.Email, &user.Username, &user.Role, &user.ProfilePhoto, &expiresAt)
 
 	if err != nil {
 		return nil
@@ -48,6 +48,40 @@ func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 		user := GetUserFromSession(r)
 		if user == nil {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		ctx := context.WithValue(r.Context(), UserKey, user)
+		next(w, r.WithContext(ctx))
+	}
+}
+
+// RequireModerator redirige si l'utilisateur n'est pas modérateur ou admin.
+func RequireModerator(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := GetUserFromSession(r)
+		if user == nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		if user.Role != "moderator" && user.Role != "admin" {
+			http.Error(w, "Accès réservé aux modérateurs", http.StatusForbidden)
+			return
+		}
+		ctx := context.WithValue(r.Context(), UserKey, user)
+		next(w, r.WithContext(ctx))
+	}
+}
+
+// RequireAdmin redirige si l'utilisateur n'est pas admin.
+func RequireAdmin(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := GetUserFromSession(r)
+		if user == nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		if user.Role != "admin" {
+			http.Error(w, "Accès réservé aux administrateurs", http.StatusForbidden)
 			return
 		}
 		ctx := context.WithValue(r.Context(), UserKey, user)

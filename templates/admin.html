@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration — SportTalk</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="header-logo">Sport<span>Talk</span></a>
+  <nav class="header-nav">
+    <a href="/" style="font-size:0.85rem;color:var(--text-mute)">← Accueil</a>
+    <details class="user-dropdown">
+      <summary>
+        <div class="header-avatar">
+          {{if .User.ProfilePhoto}}<img src="/uploads/{{.User.ProfilePhoto}}" alt="">{{else}}{{slice .User.Username 0 1}}{{end}}
+        </div>
+        {{.User.Username}}
+      </summary>
+      <div class="dropdown-menu">
+        <a href="/profile">Mon profil</a>
+        <a href="/admin">Administration</a>
+        <div class="dropdown-divider"></div>
+        <a href="/logout" class="danger">Déconnexion</a>
+      </div>
+    </details>
+  </nav>
+</header>
+
+<div style="max-width:960px;margin:2rem auto;padding:0 1.5rem">
+
+  {{if eq .Success "1"}}
+  <div class="alert alert-success">Rôle mis à jour avec succès.</div>
+  {{end}}
+  {{if eq .Error "self"}}
+  <div class="alert alert-error">Tu ne peux pas modifier ton propre rôle.</div>
+  {{end}}
+
+  <div class="form-card">
+    <div class="form-title">Gestion des utilisateurs</div>
+
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:8px 12px;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-mute);border-bottom:1px solid var(--border)">Utilisateur</th>
+          <th style="text-align:left;padding:8px 12px;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-mute);border-bottom:1px solid var(--border)">Email</th>
+          <th style="text-align:left;padding:8px 12px;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-mute);border-bottom:1px solid var(--border)">Rôle</th>
+          <th style="text-align:left;padding:8px 12px;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-mute);border-bottom:1px solid var(--border)">Changer</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Users}}
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:10px 12px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="post-author-avatar">
+                {{if .ProfilePhoto}}<img src="/uploads/{{.ProfilePhoto}}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">{{else}}{{slice .Username 0 1}}{{end}}
+              </div>
+              <span style="font-weight:600;font-size:0.875rem">{{.Username}}</span>
+            </div>
+          </td>
+          <td style="padding:10px 12px;font-size:0.82rem;color:var(--text-mute)">{{.Email}}</td>
+          <td style="padding:10px 12px">
+            <span class="role-badge role-{{.Role}}">{{.Role}}</span>
+          </td>
+          <td style="padding:10px 12px">
+            {{if ne .ID $.User.ID}}
+            <form action="/admin/role" method="POST" style="display:flex;gap:6px;align-items:center">
+              <input type="hidden" name="user_id" value="{{.ID}}">
+              <select name="role" class="form-control" style="padding:4px 10px;height:auto;font-size:0.8rem;width:auto">
+                <option value="guest"     {{if eq .Role "guest"}}selected{{end}}>guest</option>
+                <option value="user"      {{if eq .Role "user"}}selected{{end}}>user</option>
+                <option value="moderator" {{if eq .Role "moderator"}}selected{{end}}>moderator</option>
+                <option value="admin"     {{if eq .Role "admin"}}selected{{end}}>admin</option>
+              </select>
+              <button type="submit" class="btn btn-primary btn-sm">Appliquer</button>
+            </form>
+            {{else}}
+            <span style="font-size:0.8rem;color:var(--text-mute);font-style:italic">— vous</span>
+            {{end}}
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+
+  </div>
+</div>
+</body>
+</html>

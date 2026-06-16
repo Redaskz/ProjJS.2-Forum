@@ -22,6 +22,7 @@
         <div class="dropdown-menu">
           <a href="/profile">Mon profil</a>
           <a href="/post/create">Nouveau post</a>
+          {{if eq .User.Role "admin"}}<a href="/admin">Administration</a>{{end}}
           <div class="dropdown-divider"></div>
           <a href="/logout" class="danger">Déconnexion</a>
         </div>
@@ -119,8 +120,11 @@
           </div>
 
           {{if .User}}
-            {{if eq .User.ID .Post.UserID}}
+            {{$isOwner := eq .User.ID .Post.UserID}}
+            {{$isMod := or (eq .User.Role "moderator") (eq .User.Role "admin")}}
+            {{if or $isOwner $isMod}}
             <div class="post-actions">
+              {{if $isOwner}}
               <details style="position:relative">
                 <summary class="btn btn-ghost btn-sm" style="cursor:pointer;list-style:none">Modifier</summary>
                 <div style="position:absolute;top:calc(100% + 8px);right:0;z-index:10;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;width:340px">
@@ -138,6 +142,7 @@
                   </form>
                 </div>
               </details>
+              {{end}}
               <form action="/post/delete" method="POST" style="display:inline">
                 <input type="hidden" name="post_id" value="{{.Post.ID}}">
                 <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
@@ -189,8 +194,11 @@
             </div>
 
             {{if $.User}}
-              {{if eq $.User.ID .UserID}}
+              {{$cIsOwner := eq $.User.ID .UserID}}
+              {{$cIsMod := or (eq $.User.Role "moderator") (eq $.User.Role "admin")}}
+              {{if or $cIsOwner $cIsMod}}
               <div class="comment-actions">
+                {{if $cIsOwner}}
                 <details style="position:relative">
                   <summary class="btn btn-ghost btn-sm" style="cursor:pointer;list-style:none">Modifier</summary>
                   <div style="position:absolute;top:calc(100% + 6px);right:0;z-index:10;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;width:280px">
@@ -201,6 +209,7 @@
                     </form>
                   </div>
                 </details>
+                {{end}}
                 <form action="/comment/delete" method="POST" style="display:inline">
                   <input type="hidden" name="comment_id" value="{{.ID}}">
                   <input type="hidden" name="post_id" value="{{.PostID}}">

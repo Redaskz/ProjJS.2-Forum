@@ -1,10 +1,20 @@
 CREATE TABLE IF NOT EXISTS users (
-    id           TEXT PRIMARY KEY,
-    email        TEXT NOT NULL UNIQUE,
-    username     TEXT NOT NULL,
+    id            TEXT PRIMARY KEY,
+    email         TEXT NOT NULL UNIQUE,
+    username      TEXT NOT NULL,
     password_hash TEXT NOT NULL,
-    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
+    role          TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('guest','user','moderator','admin')),
+    profile_photo TEXT NOT NULL DEFAULT '',
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TRIGGER IF NOT EXISTS first_user_admin
+AFTER INSERT ON users
+BEGIN
+    UPDATE users SET role = 'admin'
+    WHERE id = NEW.id
+    AND (SELECT COUNT(*) FROM users) = 1;
+END;
 
 CREATE TABLE IF NOT EXISTS sessions (
     id         TEXT PRIMARY KEY,

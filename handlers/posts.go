@@ -242,7 +242,7 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if post.UserID != user.ID {
+	if post.UserID != user.ID && user.Role != "moderator" && user.Role != "admin" {
 		http.Error(w, "Accès interdit", http.StatusForbidden)
 		return
 	}

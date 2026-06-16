@@ -32,11 +32,11 @@ func GetUserByEmail(email string) (*models.User, error) {
 	user := &models.User{}
 
 	err := DB.QueryRow(`
-		SELECT id, email, username, password_hash, COALESCE(profile_photo, ''), created_at
+		SELECT id, email, username, password_hash, COALESCE(role,'user'), COALESCE(profile_photo, ''), created_at
 		FROM users WHERE email = ?
 	`, email).Scan(
 		&user.ID, &user.Email, &user.Username,
-		&user.PasswordHash, &user.ProfilePhoto, &user.CreatedAt,
+		&user.PasswordHash, &user.Role, &user.ProfilePhoto, &user.CreatedAt,
 	)
 
 	if err == sql.ErrNoRows {
@@ -53,11 +53,11 @@ func GetUserByID(id string) (*models.User, error) {
 	user := &models.User{}
 
 	err := DB.QueryRow(`
-		SELECT id, email, username, COALESCE(profile_photo, ''), created_at
+		SELECT id, email, username, COALESCE(role,'user'), COALESCE(profile_photo, ''), created_at
 		FROM users WHERE id = ?
 	`, id).Scan(
 		&user.ID, &user.Email, &user.Username,
-		&user.ProfilePhoto, &user.CreatedAt,
+		&user.Role, &user.ProfilePhoto, &user.CreatedAt,
 	)
 
 	if err == sql.ErrNoRows {
@@ -68,6 +68,32 @@ func GetUserByID(id string) (*models.User, error) {
 	}
 
 	return user, nil
+}
+
+func GetAllUsers() ([]models.User, error) {
+	rows, err := DB.Query(`
+		SELECT id, email, username, COALESCE(role,'user'), COALESCE(profile_photo,''), created_at
+		FROM users ORDER BY created_at ASC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []models.User
+	for rows.Next() {
+		var u models.User
+		if err := rows.Scan(&u.ID, &u.Email, &u.Username, &u.Role, &u.ProfilePhoto, &u.CreatedAt); err != nil {
+			return nil, err
+		}
+		users = append(users, u)
+	}
+	return users, nil
+}
+
+func UpdateUserRole(userID, role string) error {
+	_, err := DB.Exec(`UPDATE users SET role = ? WHERE id = ?`, role, userID)
+	return err
 }
 
 func UpdatePassword(userID, hashedPassword string) error {

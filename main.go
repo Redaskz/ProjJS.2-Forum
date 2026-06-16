@@ -76,6 +76,10 @@ func main() {
 	mux.HandleFunc("/profile/password", middleware.RequireAuth(handlers.ChangePassword))
 	mux.HandleFunc("/profile/photo", middleware.RequireAuth(handlers.UploadProfilePhoto))
 
+	// Administration (admin uniquement)
+	mux.HandleFunc("/admin", middleware.RequireAdmin(handlers.ShowAdmin))
+	mux.HandleFunc("/admin/role", middleware.RequireAdmin(handlers.ChangeUserRole))
+
 	// Pages d'erreur
 	mux.HandleFunc("/404", notFoundHandler)
 	mux.HandleFunc("/500", internalErrorHandler)

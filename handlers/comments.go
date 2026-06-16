@@ -83,7 +83,7 @@ func DeleteComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if comment.UserID != user.ID {
+	if comment.UserID != user.ID && user.Role != "moderator" && user.Role != "admin" {
 		http.Error(w, "Accès interdit", http.StatusForbidden)
 		return
 	}
