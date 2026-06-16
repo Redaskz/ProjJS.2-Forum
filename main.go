@@ -76,6 +76,9 @@ func main() {
 	mux.HandleFunc("/profile/password", middleware.RequireAuth(handlers.ChangePassword))
 	mux.HandleFunc("/profile/photo", middleware.RequireAuth(handlers.UploadProfilePhoto))
 
+	// Calendrier Coupe du Monde 2026
+	mux.HandleFunc("/calendrier", middleware.WithUser(handlers.ShowCalendar))
+
 	// Administration (admin uniquement)
 	mux.HandleFunc("/admin", middleware.RequireAdmin(handlers.ShowAdmin))
 	mux.HandleFunc("/admin/role", middleware.RequireAdmin(handlers.ChangeUserRole))

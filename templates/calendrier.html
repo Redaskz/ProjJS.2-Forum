@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendrier FIFA World Cup 2026 — SportTalk</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .cal-wrap { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+
+    .cal-hero {
+      background: linear-gradient(135deg, #0A0E1A 0%, #111827 60%, rgba(0,255,135,0.06) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .cal-hero-icon { font-size: 2.5rem; line-height: 1; }
+    .cal-hero-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 1.1;
+    }
+    .cal-hero-title span { color: var(--green); }
+    .cal-hero-sub { font-size: 0.82rem; color: var(--text-mute); margin-top: 4px; }
+
+    .cal-phase-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      padding: 0 0 0.6rem;
+      margin: 2rem 0 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cal-day { margin-bottom: 1.25rem; }
+    .cal-day-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .cal-day-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .cal-day-label.today { color: var(--green); }
+    .cal-day-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-live 1.5s infinite;
+    }
+
+    .cal-match {
+      display: grid;
+      grid-template-columns: 32px 1fr 90px;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 4px;
+      transition: border-color 0.15s;
+    }
+    .cal-match:hover { border-color: #2A3A50; }
+    .cal-match.today-match { border-left: 2px solid var(--green); }
+
+    .cal-group-badge {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text-mute);
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 5px;
+      text-align: center;
+    }
+
+    .cal-teams { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; }
+    .cal-team1 { color: var(--text); font-weight: 600; flex: 1; text-align: right; }
+    .cal-team2 { color: var(--text); font-weight: 600; flex: 1; }
+    .cal-vs {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-mute);
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-card2);
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .cal-status {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .cal-status.done     { background: rgba(120,120,120,0.12); color: var(--text-mute); }
+    .cal-status.today    { background: rgba(0,255,135,0.1);    color: var(--green); border: 1px solid rgba(0,255,135,0.25); }
+    .cal-status.upcoming { background: rgba(59,130,246,0.1);   color: var(--blue);  border: 1px solid rgba(59,130,246,0.2); }
+
+    .cal-knockout-note {
+      background: var(--bg-card2);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-mute);
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="header-logo">Sport<span>Talk</span></a>
+  <nav class="header-nav">
+    <a href="/" style="font-size:0.85rem;color:var(--text-mute)">← Accueil</a>
+    {{if .User}}
+    <details class="user-dropdown">
+      <summary>
+        <div class="header-avatar">
+          {{if .User.ProfilePhoto}}<img src="/uploads/{{.User.ProfilePhoto}}" alt="">{{else}}{{slice .User.Username 0 1}}{{end}}
+        </div>
+        {{.User.Username}}
+      </summary>
+      <div class="dropdown-menu">
+        <a href="/profile">Mon profil</a>
+        <a href="/post/create">Nouveau post</a>
+        {{if eq .User.Role "admin"}}<a href="/admin">Administration</a>{{end}}
+        <div class="dropdown-divider"></div>
+        <a href="/logout" class="danger">Déconnexion</a>
+      </div>
+    </details>
+    {{else}}
+    <a href="/login" class="btn btn-ghost">Connexion</a>
+    {{end}}
+  </nav>
+</header>
+
+<div class="cal-wrap">
+
+  <div class="cal-hero">
+    <div class="cal-hero-icon">🏆</div>
+    <div>
+      <div class="cal-hero-title">FIFA World Cup <span>2026</span></div>
+      <div class="cal-hero-sub">USA · Canada · Mexique &nbsp;·&nbsp; 11 juin – 19 juillet 2026 &nbsp;·&nbsp; 48 équipes</div>
+    </div>
+  </div>
+
+  <div class="cal-phase-title">Phase de groupes</div>
+
+  <!-- 11 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">11 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">A</span>
+      <div class="cal-teams"><span class="cal-team1">Mexique</span><span class="cal-vs">VS</span><span class="cal-team2">Afrique du Sud</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">A</span>
+      <div class="cal-teams"><span class="cal-team1">Corée du Sud</span><span class="cal-vs">VS</span><span class="cal-team2">Playoff A</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+  </div>
+
+  <!-- 12 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">12 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">B</span>
+      <div class="cal-teams"><span class="cal-team1">Canada</span><span class="cal-vs">VS</span><span class="cal-team2">Playoff B</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">D</span>
+      <div class="cal-teams"><span class="cal-team1">États-Unis</span><span class="cal-vs">VS</span><span class="cal-team2">Paraguay</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+  </div>
+
+  <!-- 13 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">13 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">C</span>
+      <div class="cal-teams"><span class="cal-team1">Haïti</span><span class="cal-vs">VS</span><span class="cal-team2">Écosse</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">D</span>
+      <div class="cal-teams"><span class="cal-team1">Australie</span><span class="cal-vs">VS</span><span class="cal-team2">Playoff D</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">C</span>
+      <div class="cal-teams"><span class="cal-team1">Brésil</span><span class="cal-vs">VS</span><span class="cal-team2">Maroc</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">B</span>
+      <div class="cal-teams"><span class="cal-team1">Qatar</span><span class="cal-vs">VS</span><span class="cal-team2">Suisse</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+  </div>
+
+  <!-- 14 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">14 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">E</span>
+      <div class="cal-teams"><span class="cal-team1">Côte d'Ivoire</span><span class="cal-vs">VS</span><span class="cal-team2">Équateur</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">E</span>
+      <div class="cal-teams"><span class="cal-team1">Allemagne</span><span class="cal-vs">VS</span><span class="cal-team2">Curaçao</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">F</span>
+      <div class="cal-teams"><span class="cal-team1">Pays-Bas</span><span class="cal-vs">VS</span><span class="cal-team2">Japon</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">F</span>
+      <div class="cal-teams"><span class="cal-team1">Playoff F</span><span class="cal-vs">VS</span><span class="cal-team2">Tunisie</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+  </div>
+
+  <!-- 15 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">15 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">H</span>
+      <div class="cal-teams"><span class="cal-team1">Arabie Saoudite</span><span class="cal-vs">VS</span><span class="cal-team2">Uruguay</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">H</span>
+      <div class="cal-teams"><span class="cal-team1">Espagne</span><span class="cal-vs">VS</span><span class="cal-team2">Cap-Vert</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">G</span>
+      <div class="cal-teams"><span class="cal-team1">Iran</span><span class="cal-vs">VS</span><span class="cal-team2">Nouvelle-Zélande</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">G</span>
+      <div class="cal-teams"><span class="cal-team1">Belgique</span><span class="cal-vs">VS</span><span class="cal-team2">Égypte</span></div>
+      <span class="cal-status done">Terminé</span>
+    </div>
+  </div>
+
+  <!-- 16 JUIN — AUJOURD'HUI -->
+  <div class="cal-day">
+    <div class="cal-day-header">
+      <div class="cal-day-dot"></div>
+      <span class="cal-day-label today">16 juin 2026 · Aujourd'hui</span>
+    </div>
+    <div class="cal-match today-match">
+      <span class="cal-group-badge">I</span>
+      <div class="cal-teams"><span class="cal-team1">France</span><span class="cal-vs">VS</span><span class="cal-team2">Sénégal</span></div>
+      <span class="cal-status today">Aujourd'hui</span>
+    </div>
+    <div class="cal-match today-match">
+      <span class="cal-group-badge">I</span>
+      <div class="cal-teams"><span class="cal-team1">Playoff I</span><span class="cal-vs">VS</span><span class="cal-team2">Norvège</span></div>
+      <span class="cal-status today">Aujourd'hui</span>
+    </div>
+    <div class="cal-match today-match">
+      <span class="cal-group-badge">J</span>
+      <div class="cal-teams"><span class="cal-team1">Argentine</span><span class="cal-vs">VS</span><span class="cal-team2">Algérie</span></div>
+      <span class="cal-status today">Aujourd'hui</span>
+    </div>
+    <div class="cal-match today-match">
+      <span class="cal-group-badge">J</span>
+      <div class="cal-teams"><span class="cal-team1">Autriche</span><span class="cal-vs">VS</span><span class="cal-team2">Jordanie</span></div>
+      <span class="cal-status today">Aujourd'hui</span>
+    </div>
+  </div>
+
+  <!-- 17 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">17 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">L</span>
+      <div class="cal-teams"><span class="cal-team1">Ghana</span><span class="cal-vs">VS</span><span class="cal-team2">Panama</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">L</span>
+      <div class="cal-teams"><span class="cal-team1">Angleterre</span><span class="cal-vs">VS</span><span class="cal-team2">Croatie</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">K</span>
+      <div class="cal-teams"><span class="cal-team1">Portugal</span><span class="cal-vs">VS</span><span class="cal-team2">Playoff K</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">K</span>
+      <div class="cal-teams"><span class="cal-team1">Ouzbékistan</span><span class="cal-vs">VS</span><span class="cal-team2">Colombie</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+  </div>
+
+  <!-- 18 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">18 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">A</span>
+      <div class="cal-teams"><span class="cal-team1">Playoff A</span><span class="cal-vs">VS</span><span class="cal-team2">Afrique du Sud</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">B</span>
+      <div class="cal-teams"><span class="cal-team1">Suisse</span><span class="cal-vs">VS</span><span class="cal-team2">Playoff B</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">B</span>
+      <div class="cal-teams"><span class="cal-team1">Canada</span><span class="cal-vs">VS</span><span class="cal-team2">Qatar</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">A</span>
+      <div class="cal-teams"><span class="cal-team1">Mexique</span><span class="cal-vs">VS</span><span class="cal-team2">Corée du Sud</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+  </div>
+
+  <!-- 19 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">19 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">C</span>
+      <div class="cal-teams"><span class="cal-team1">Brésil</span><span class="cal-vs">VS</span><span class="cal-team2">Haïti</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">C</span>
+      <div class="cal-teams"><span class="cal-team1">Écosse</span><span class="cal-vs">VS</span><span class="cal-team2">Maroc</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">D</span>
+      <div class="cal-teams"><span class="cal-team1">Playoff D</span><span class="cal-vs">VS</span><span class="cal-team2">Paraguay</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">D</span>
+      <div class="cal-teams"><span class="cal-team1">États-Unis</span><span class="cal-vs">VS</span><span class="cal-team2">Australie</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+  </div>
+
+  <!-- 20 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">20 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">E</span>
+      <div class="cal-teams"><span class="cal-team1">Allemagne</span><span class="cal-vs">VS</span><span class="cal-team2">Côte d'Ivoire</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">E</span>
+      <div class="cal-teams"><span class="cal-team1">Équateur</span><span class="cal-vs">VS</span><span class="cal-team2">Curaçao</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">F</span>
+      <div class="cal-teams"><span class="cal-team1">Pays-Bas</span><span class="cal-vs">VS</span><span class="cal-team2">Playoff F</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">F</span>
+      <div class="cal-teams"><span class="cal-team1">Tunisie</span><span class="cal-vs">VS</span><span class="cal-team2">Japon</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+  </div>
+
+  <!-- 21 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">21 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">H</span>
+      <div class="cal-teams"><span class="cal-team1">Uruguay</span><span class="cal-vs">VS</span><span class="cal-team2">Cap-Vert</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">H</span>
+      <div class="cal-teams"><span class="cal-team1">Espagne</span><span class="cal-vs">VS</span><span class="cal-team2">Arabie Saoudite</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">G</span>
+      <div class="cal-teams"><span class="cal-team1">Belgique</span><span class="cal-vs">VS</span><span class="cal-team2">Iran</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">G</span>
+      <div class="cal-teams"><span class="cal-team1">Nouvelle-Zélande</span><span class="cal-vs">VS</span><span class="cal-team2">Égypte</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+  </div>
+
+  <!-- 22 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">22 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">I</span>
+      <div class="cal-teams"><span class="cal-team1">Norvège</span><span class="cal-vs">VS</span><span class="cal-team2">Sénégal</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">I</span>
+      <div class="cal-teams"><span class="cal-team1">France</span><span class="cal-vs">VS</span><span class="cal-team2">Playoff I</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">J</span>
+      <div class="cal-teams"><span class="cal-team1">Argentine</span><span class="cal-vs">VS</span><span class="cal-team2">Autriche</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">J</span>
+      <div class="cal-teams"><span class="cal-team1">Jordanie</span><span class="cal-vs">VS</span><span class="cal-team2">Algérie</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+  </div>
+
+  <!-- 23 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">23 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">L</span>
+      <div class="cal-teams"><span class="cal-team1">Angleterre</span><span class="cal-vs">VS</span><span class="cal-team2">Ghana</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">L</span>
+      <div class="cal-teams"><span class="cal-team1">Panama</span><span class="cal-vs">VS</span><span class="cal-team2">Croatie</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">K</span>
+      <div class="cal-teams"><span class="cal-team1">Portugal</span><span class="cal-vs">VS</span><span class="cal-team2">Ouzbékistan</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">K</span>
+      <div class="cal-teams"><span class="cal-team1">Colombie</span><span class="cal-vs">VS</span><span class="cal-team2">Playoff K</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+  </div>
+
+  <!-- 24 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">24 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">C</span>
+      <div class="cal-teams"><span class="cal-team1">Écosse</span><span class="cal-vs">VS</span><span class="cal-team2">Brésil</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">C</span>
+      <div class="cal-teams"><span class="cal-team1">Maroc</span><span class="cal-vs">VS</span><span class="cal-team2">Haïti</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">B</span>
+      <div class="cal-teams"><span class="cal-team1">Suisse</span><span class="cal-vs">VS</span><span class="cal-team2">Canada</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">B</span>
+      <div class="cal-teams"><span class="cal-team1">Playoff B</span><span class="cal-vs">VS</span><span class="cal-team2">Qatar</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">A</span>
+      <div class="cal-teams"><span class="cal-team1">Playoff A</span><span class="cal-vs">VS</span><span class="cal-team2">Mexique</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">A</span>
+      <div class="cal-teams"><span class="cal-team1">Afrique du Sud</span><span class="cal-vs">VS</span><span class="cal-team2">Corée du Sud</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+  </div>
+
+  <!-- 25 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">25 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">E</span>
+      <div class="cal-teams"><span class="cal-team1">Curaçao</span><span class="cal-vs">VS</span><span class="cal-team2">Côte d'Ivoire</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">E</span>
+      <div class="cal-teams"><span class="cal-team1">Équateur</span><span class="cal-vs">VS</span><span class="cal-team2">Allemagne</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">F</span>
+      <div class="cal-teams"><span class="cal-team1">Japon</span><span class="cal-vs">VS</span><span class="cal-team2">Playoff F</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">F</span>
+      <div class="cal-teams"><span class="cal-team1">Tunisie</span><span class="cal-vs">VS</span><span class="cal-team2">Pays-Bas</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">D</span>
+      <div class="cal-teams"><span class="cal-team1">Playoff D</span><span class="cal-vs">VS</span><span class="cal-team2">États-Unis</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">D</span>
+      <div class="cal-teams"><span class="cal-team1">Paraguay</span><span class="cal-vs">VS</span><span class="cal-team2">Australie</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+  </div>
+
+  <!-- 26 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">26 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">I</span>
+      <div class="cal-teams"><span class="cal-team1">Norvège</span><span class="cal-vs">VS</span><span class="cal-team2">France</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">I</span>
+      <div class="cal-teams"><span class="cal-team1">Sénégal</span><span class="cal-vs">VS</span><span class="cal-team2">Playoff I</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">G</span>
+      <div class="cal-teams"><span class="cal-team1">Égypte</span><span class="cal-vs">VS</span><span class="cal-team2">Iran</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">G</span>
+      <div class="cal-teams"><span class="cal-team1">Nouvelle-Zélande</span><span class="cal-vs">VS</span><span class="cal-team2">Belgique</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">H</span>
+      <div class="cal-teams"><span class="cal-team1">Cap-Vert</span><span class="cal-vs">VS</span><span class="cal-team2">Arabie Saoudite</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">H</span>
+      <div class="cal-teams"><span class="cal-team1">Uruguay</span><span class="cal-vs">VS</span><span class="cal-team2">Espagne</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+  </div>
+
+  <!-- 27 JUIN -->
+  <div class="cal-day">
+    <div class="cal-day-header"><span class="cal-day-label">27 juin 2026</span></div>
+    <div class="cal-match">
+      <span class="cal-group-badge">L</span>
+      <div class="cal-teams"><span class="cal-team1">Panama</span><span class="cal-vs">VS</span><span class="cal-team2">Angleterre</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">L</span>
+      <div class="cal-teams"><span class="cal-team1">Croatie</span><span class="cal-vs">VS</span><span class="cal-team2">Ghana</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">J</span>
+      <div class="cal-teams"><span class="cal-team1">Algérie</span><span class="cal-vs">VS</span><span class="cal-team2">Autriche</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">J</span>
+      <div class="cal-teams"><span class="cal-team1">Jordanie</span><span class="cal-vs">VS</span><span class="cal-team2">Argentine</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">K</span>
+      <div class="cal-teams"><span class="cal-team1">Colombie</span><span class="cal-vs">VS</span><span class="cal-team2">Portugal</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+    <div class="cal-match">
+      <span class="cal-group-badge">K</span>
+      <div class="cal-teams"><span class="cal-team1">Playoff K</span><span class="cal-vs">VS</span><span class="cal-team2">Ouzbékistan</span></div>
+      <span class="cal-status upcoming">À venir</span>
+    </div>
+  </div>
+
+  <div class="cal-phase-title">Phase éliminatoire</div>
+
+  <div class="cal-knockout-note">
+    Huitièmes · Quarts · Demi-finales · Finale — du 1er au 19 juillet 2026
+  </div>
+  <div class="cal-knockout-note">
+    Les équipes qualifiées seront connues à l'issue de la phase de groupes (27 juin).
+  </div>
+
+</div>
+</body>
+</html>

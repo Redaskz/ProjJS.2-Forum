@@ -136,6 +136,49 @@ img { max-width: 100%; height: auto; display: block; }
   padding: 1.5rem;
 }
 
+/* 3-colonnes : sidebar nav | feed | panneau droit */
+.layout-v2 {
+  display: grid;
+  grid-template-columns: 195px 1fr 275px;
+  gap: 1.5rem;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  align-items: start;
+}
+
+/* ── BARRE CATÉGORIES HORIZONTALE ── */
+.cat-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-wrap: wrap;
+}
+.cat-bar::-webkit-scrollbar { display: none; }
+
+.cat-bar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  white-space: nowrap;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.cat-bar-link:hover { background: var(--bg-card2); color: var(--text); }
+.cat-bar-link.active { background: var(--bg-card2); color: var(--green); }
+
 /* ── SIDEBAR ── */
 .sidebar { position: sticky; top: 76px; height: fit-content; }
 
@@ -177,6 +220,143 @@ img { max-width: 100%; height: auto; display: block; }
 .sidebar-links a.active { color: var(--green); }
 
 .cat-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+/* ── TOP NAV BAR (index page) ── */
+.page-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.top-nav {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 0.75rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.top-nav::-webkit-scrollbar { display: none; }
+
+.top-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0.5rem 0;
+  flex-shrink: 0;
+}
+
+.top-nav-div {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  flex-shrink: 0;
+  margin: 0 0.5rem;
+}
+
+.top-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.top-nav-link:hover { background: var(--bg-card2); color: var(--text); }
+.top-nav-link.active { background: var(--bg-card2); color: var(--green); }
+
+/* ── FEED + RIGHT PANEL LAYOUT ── */
+.layout-feed {
+  display: grid;
+  grid-template-columns: 1fr 285px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ── RIGHT PANEL (World Cup) ── */
+.right-panel { position: sticky; top: 76px; }
+
+.panel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.match-section { padding: 0.625rem 0.75rem; }
+.match-section + .match-section { border-top: 1px solid var(--border); }
+
+.match-date-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-family: 'Rajdhani', sans-serif;
+  margin-bottom: 0.4rem;
+}
+
+.match-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 6px;
+  border-radius: 5px;
+  margin-bottom: 2px;
+  transition: background 0.12s;
+}
+.match-item:hover { background: var(--bg-card2); }
+
+.match-team {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  flex: 1;
+}
+.match-team.right { text-align: right; }
+
+.match-score {
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: 'Rajdhani', sans-serif;
+  padding: 2px 7px;
+  border-radius: 4px;
+  min-width: 46px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.match-score.done     { background: rgba(120,120,120,0.15); color: var(--text-mute); }
+.match-score.upcoming { background: rgba(59,130,246,0.12);  color: var(--blue); }
+.match-score.live     { background: rgba(0,255,135,0.12);   color: var(--green); animation: pulse-live 1.5s infinite; }
+
+@keyframes pulse-live {
+  0%,100% { opacity:1; }
+  50% { opacity:0.55; }
+}
 
 /* ── FEED ── */
 .feed-header {

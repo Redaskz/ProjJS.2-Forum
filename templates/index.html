@@ -34,8 +34,9 @@
   </nav>
 </header>
 
-<div class="layout">
+<div class="layout-v2">
 
+  <!-- ── SIDEBAR GAUCHE : navigation ── -->
   <aside class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-title">Navigation</div>
@@ -43,32 +44,27 @@
         <li><a href="/" {{if not .Filter}}class="active"{{end}}>Tous les posts</a></li>
         {{if .User}}
         <li><a href="/?filter=myposts" {{if eq .Filter "myposts"}}class="active"{{end}}>Mes posts</a></li>
-        <li><a href="/?filter=liked" {{if eq .Filter "liked"}}class="active"{{end}}>Posts aimés</a></li>
-        <li><a href="/profile" {{if eq .Filter "profile"}}class="active"{{end}}>Mon profil</a></li>
+        <li><a href="/?filter=liked"   {{if eq .Filter "liked"}}class="active"{{end}}>Posts aimés</a></li>
+        <li><a href="/profile">Mon profil</a></li>
         {{end}}
-      </ul>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-title">Catégories</div>
-      <ul class="sidebar-links">
-        {{range .Categories}}
-        <li>
-          <a href="/?filter=category&id={{.ID}}" {{if eq $.FilterID .ID}}class="active"{{end}}>
-            <span class="cat-dot"></span>{{.Name}}
-            <span class="cat-icon">
-              {{if eq .Name "Général"}}<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>{{end}}
-              {{if eq .Name "Humour"}}<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>{{end}}
-              {{if eq .Name "Sport"}}<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>{{end}}
-            </span>
-          </a>
-        </li>
-        {{end}}
+        <li><a href="/calendrier">🏆 Calendrier WC26</a></li>
       </ul>
     </div>
   </aside>
 
+  <!-- ── COLONNE CENTRALE : catégories + feed ── -->
   <main>
+
+    <!-- Barre catégories horizontale -->
+    <div class="cat-bar">
+      <a href="/" class="cat-bar-link {{if not .Filter}}active{{end}}">Tout</a>
+      {{range .Categories}}
+      <a href="/?filter=category&id={{.ID}}" class="cat-bar-link {{if eq $.FilterID .ID}}active{{end}}">
+        <span class="cat-dot"></span>{{.Name}}
+      </a>
+      {{end}}
+    </div>
+
     <div class="feed-header">
       <h1 class="feed-title">
         {{if eq .Filter "myposts"}}Mes posts
@@ -118,17 +114,13 @@
                 <input type="hidden" name="target_id" value="{{.ID}}">
                 <input type="hidden" name="target_type" value="post">
                 <input type="hidden" name="value" value="1">
-                <button type="submit" class="vote-btn like {{if eq .UserVote 1}}active-like{{end}}">
-                  +{{.Likes}}
-                </button>
+                <button type="submit" class="vote-btn like {{if eq .UserVote 1}}active-like{{end}}">+{{.Likes}}</button>
               </form>
               <form action="/like" method="POST" style="display:inline">
                 <input type="hidden" name="target_id" value="{{.ID}}">
                 <input type="hidden" name="target_type" value="post">
                 <input type="hidden" name="value" value="-1">
-                <button type="submit" class="vote-btn dislike {{if eq .UserVote -1}}active-dislike{{end}}">
-                  -{{.Dislikes}}
-                </button>
+                <button type="submit" class="vote-btn dislike {{if eq .UserVote -1}}active-dislike{{end}}">-{{.Dislikes}}</button>
               </form>
               {{else}}
               <span class="vote-btn like">+{{.Likes}}</span>
@@ -136,9 +128,7 @@
               {{end}}
             </div>
 
-            <a href="/post/?id={{.ID}}" class="post-comments-count">
-              Commentaires
-            </a>
+            <a href="/post/?id={{.ID}}" class="post-comments-count">Commentaires</a>
 
             {{if $.User}}
               {{$isOwner := eq $.User.ID .UserID}}
@@ -146,7 +136,7 @@
               {{if or $isOwner $isMod}}
               <div class="post-actions">
                 {{if $isOwner}}
-                <a href="/post/?id={{.ID}}" class="btn btn-ghost btn-sm" title="Options du post" style="padding:5px 8px">⚙</a>
+                <a href="/post/?id={{.ID}}" class="btn btn-ghost btn-sm" title="Options" style="padding:5px 8px">⚙</a>
                 <a href="/post/?id={{.ID}}" class="btn btn-ghost btn-sm">Modifier</a>
                 {{end}}
                 <form action="/post/delete" method="POST" style="display:inline">
@@ -171,6 +161,112 @@
       </div>
     {{end}}
   </main>
+
+  <!-- ── PANNEAU DROIT : Coupe du Monde 2026 ── -->
+  <aside class="right-panel">
+    <div class="panel-card">
+      <div class="panel-header">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        FIFA World Cup 2026 · Groupes
+      </div>
+
+      <!-- 14 juin -->
+      <div class="match-section">
+        <div class="match-date-label">14 juin</div>
+        <div class="match-item">
+          <span class="match-team">🇨🇮 C. Ivoire</span>
+          <span class="match-score done">Terminé</span>
+          <span class="match-team right">Équateur 🇪🇨</span>
+        </div>
+        <div class="match-item">
+          <span class="match-team">🇩🇪 Allemagne</span>
+          <span class="match-score done">Terminé</span>
+          <span class="match-team right">Curaçao 🇨🇼</span>
+        </div>
+        <div class="match-item">
+          <span class="match-team">🇳🇱 Pays-Bas</span>
+          <span class="match-score done">Terminé</span>
+          <span class="match-team right">Japon 🇯🇵</span>
+        </div>
+      </div>
+
+      <!-- 15 juin -->
+      <div class="match-section">
+        <div class="match-date-label">15 juin · Hier</div>
+        <div class="match-item">
+          <span class="match-team">🇸🇦 Arabie S.</span>
+          <span class="match-score done">Terminé</span>
+          <span class="match-team right">Uruguay 🇺🇾</span>
+        </div>
+        <div class="match-item">
+          <span class="match-team">🇪🇸 Espagne</span>
+          <span class="match-score done">Terminé</span>
+          <span class="match-team right">Cap-Vert 🇨🇻</span>
+        </div>
+        <div class="match-item">
+          <span class="match-team">🇮🇷 Iran</span>
+          <span class="match-score done">Terminé</span>
+          <span class="match-team right">Nv-Zélande 🇳🇿</span>
+        </div>
+        <div class="match-item">
+          <span class="match-team">🇧🇪 Belgique</span>
+          <span class="match-score done">Terminé</span>
+          <span class="match-team right">Égypte 🇪🇬</span>
+        </div>
+      </div>
+
+      <!-- 16 juin - AUJOURD'HUI -->
+      <div class="match-section">
+        <div class="match-date-label" style="color:var(--green)">16 juin · Aujourd'hui</div>
+        <div class="match-item">
+          <span class="match-team">🇫🇷 France</span>
+          <span class="match-score live">EN DIRECT</span>
+          <span class="match-team right">Sénégal 🇸🇳</span>
+        </div>
+        <div class="match-item">
+          <span class="match-team">Playoff I</span>
+          <span class="match-score upcoming">À venir</span>
+          <span class="match-team right">Norvège 🇳🇴</span>
+        </div>
+        <div class="match-item">
+          <span class="match-team">🇦🇷 Argentine</span>
+          <span class="match-score upcoming">À venir</span>
+          <span class="match-team right">Algérie 🇩🇿</span>
+        </div>
+        <div class="match-item">
+          <span class="match-team">🇦🇹 Autriche</span>
+          <span class="match-score upcoming">À venir</span>
+          <span class="match-team right">Jordanie 🇯🇴</span>
+        </div>
+      </div>
+
+      <!-- 17 juin -->
+      <div class="match-section">
+        <div class="match-date-label">17 juin · Demain</div>
+        <div class="match-item">
+          <span class="match-team">🇬🇭 Ghana</span>
+          <span class="match-score upcoming">À venir</span>
+          <span class="match-team right">Panama 🇵🇦</span>
+        </div>
+        <div class="match-item">
+          <span class="match-team">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre</span>
+          <span class="match-score upcoming">À venir</span>
+          <span class="match-team right">Croatie 🇭🇷</span>
+        </div>
+        <div class="match-item">
+          <span class="match-team">🇵🇹 Portugal</span>
+          <span class="match-score upcoming">À venir</span>
+          <span class="match-team right">Playoff K</span>
+        </div>
+        <div class="match-item">
+          <span class="match-team">🇺🇿 Ouzbékistan</span>
+          <span class="match-score upcoming">À venir</span>
+          <span class="match-team right">Colombie 🇨🇴</span>
+        </div>
+      </div>
+
+    </div>
+  </aside>
 
 </div>
 </body>
