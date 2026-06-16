@@ -21,7 +21,6 @@ func ListPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var currentUser *models.User
-
 	if u := r.Context().Value(middleware.UserKey); u != nil {
 		currentUser = u.(*models.User)
 	}
@@ -39,31 +38,26 @@ func ListPosts(w http.ResponseWriter, r *http.Request) {
 	)
 
 	switch filter {
-
 	case "category":
-		categoryID := r.URL.Query().Get("id")
-		posts, err = database.GetPostsByCategory(categoryID, userID)
-
+		posts, err = database.GetPostsByCategory(r.URL.Query().Get("id"), userID)
 	case "myposts":
 		if currentUser == nil {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 		posts, err = database.GetPostsByUser(currentUser.ID, userID)
-
 	case "liked":
 		if currentUser == nil {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 		posts, err = database.GetLikedPostsByUser(currentUser.ID)
-
 	default:
 		posts, err = database.GetAllPosts(userID)
 	}
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serveInternalError(w)
 		return
 	}
 
@@ -89,32 +83,29 @@ func ListPosts(w http.ResponseWriter, r *http.Request) {
 
 func ShowPost(w http.ResponseWriter, r *http.Request) {
 	var currentUser *models.User
-
 	if u := r.Context().Value(middleware.UserKey); u != nil {
 		currentUser = u.(*models.User)
 	}
-
-	postID := r.URL.Query().Get("id")
 
 	userID := ""
 	if currentUser != nil {
 		userID = currentUser.ID
 	}
 
-	post, err := database.GetPostByID(postID, userID)
+	post, err := database.GetPostByID(r.URL.Query().Get("id"), userID)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		serveInternalError(w)
 		return
 	}
-
 	if post == nil {
-		http.NotFound(w, r)
+		w.WriteHeader(http.StatusNotFound)
+		http.ServeFile(w, r, "templates/404.html")
 		return
 	}
 
-	comments, err := database.GetCommentsByPost(postID, userID)
+	comments, err := database.GetCommentsByPost(post.ID, userID)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		serveInternalError(w)
 		return
 	}
 
@@ -157,11 +148,7 @@ func ShowCreatePost(w http.ResponseWriter, r *http.Request) {
 func CreatePost(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(middleware.UserKey).(*models.User)
 
-	r.ParseMultipartForm(20 << 20) // 20 Mo max
-
-	title := r.FormValue("title")
-	content := r.FormValue("content")
-	categoryIDs := r.Form["categories"]
+	r.ParseMultipartForm(20 << 20)
 
 	imagePath := ""
 	file, handler, err := r.FormFile("image")
@@ -182,9 +169,9 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, err = database.CreatePost(user.ID, title, content, imagePath, categoryIDs)
+	_, err = database.CreatePost(user.ID, r.FormValue("title"), r.FormValue("content"), imagePath, r.Form["categories"])
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		serveInternalError(w)
 		return
 	}
 
@@ -198,28 +185,21 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 
 	post, err := database.GetPostByID(postID, user.ID)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		serveInternalError(w)
 		return
 	}
-
 	if post == nil {
-		http.NotFound(w, r)
+		w.WriteHeader(http.StatusNotFound)
+		http.ServeFile(w, r, "templates/404.html")
 		return
 	}
-
 	if post.UserID != user.ID {
 		http.Error(w, "Accès interdit", http.StatusForbidden)
 		return
 	}
 
-	err = database.UpdatePost(
-		postID,
-		r.FormValue("title"),
-		r.FormValue("content"),
-	)
-
-	if err != nil {
-		http.Error(w, err.Error(), 500)
+	if err = database.UpdatePost(postID, r.FormValue("title"), r.FormValue("content")); err != nil {
+		serveInternalError(w)
 		return
 	}
 
@@ -233,23 +213,21 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 
 	post, err := database.GetPostByID(postID, user.ID)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		serveInternalError(w)
 		return
 	}
-
 	if post == nil {
-		http.NotFound(w, r)
+		w.WriteHeader(http.StatusNotFound)
+		http.ServeFile(w, r, "templates/404.html")
 		return
 	}
-
 	if post.UserID != user.ID && user.Role != "moderator" && user.Role != "admin" {
 		http.Error(w, "Accès interdit", http.StatusForbidden)
 		return
 	}
 
-	err = database.DeletePost(postID)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
+	if err = database.DeletePost(postID); err != nil {
+		serveInternalError(w)
 		return
 	}
 

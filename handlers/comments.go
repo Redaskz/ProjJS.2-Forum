@@ -18,14 +18,8 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := database.CreateComment(
-		postID,
-		user.ID,
-		content,
-	)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if _, err := database.CreateComment(postID, user.ID, content); err != nil {
+		serveInternalError(w)
 		return
 	}
 
@@ -36,31 +30,24 @@ func UpdateComment(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(middleware.UserKey).(*models.User)
 
 	commentID := r.FormValue("comment_id")
-	content := r.FormValue("content")
 
 	comment, err := database.GetCommentByID(commentID)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		serveInternalError(w)
 		return
 	}
-
 	if comment == nil {
-		http.NotFound(w, r)
+		w.WriteHeader(http.StatusNotFound)
+		http.ServeFile(w, r, "templates/404.html")
 		return
 	}
-
 	if comment.UserID != user.ID {
 		http.Error(w, "Accès interdit", http.StatusForbidden)
 		return
 	}
 
-	err = database.UpdateComment(
-		commentID,
-		content,
-	)
-
-	if err != nil {
-		http.Error(w, err.Error(), 500)
+	if err = database.UpdateComment(commentID, r.FormValue("content")); err != nil {
+		serveInternalError(w)
 		return
 	}
 
@@ -74,23 +61,21 @@ func DeleteComment(w http.ResponseWriter, r *http.Request) {
 
 	comment, err := database.GetCommentByID(commentID)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		serveInternalError(w)
 		return
 	}
-
 	if comment == nil {
-		http.NotFound(w, r)
+		w.WriteHeader(http.StatusNotFound)
+		http.ServeFile(w, r, "templates/404.html")
 		return
 	}
-
 	if comment.UserID != user.ID && user.Role != "moderator" && user.Role != "admin" {
 		http.Error(w, "Accès interdit", http.StatusForbidden)
 		return
 	}
 
-	err = database.DeleteComment(commentID)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
+	if err = database.DeleteComment(commentID); err != nil {
+		serveInternalError(w)
 		return
 	}
 

@@ -30,20 +30,11 @@ func Init(schemaPath string) {
 		log.Fatal("Erreur exécution schema.sql:", err)
 	}
 
-	// Migrations silencieuses (échouent si la colonne existe déjà)
+	// Migrations silencieuses pour les bases créées avant l'ajout de ces colonnes.
 	DB.Exec(`ALTER TABLE users ADD COLUMN profile_photo TEXT NOT NULL DEFAULT ''`)
 	DB.Exec(`ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'`)
 
-	// Trigger : premier utilisateur inscrit devient admin
-	DB.Exec(`CREATE TRIGGER IF NOT EXISTS first_user_admin
-AFTER INSERT ON users
-BEGIN
-    UPDATE users SET role = 'admin'
-    WHERE id = NEW.id
-    AND (SELECT COUNT(*) FROM users) = 1;
-END`)
-
-	// Si la base existante n'a aucun admin, promouvoir le plus ancien utilisateur
+	// Si la base existante n'a aucun admin, promouvoir le plus ancien utilisateur.
 	var adminCount int
 	if DB.QueryRow("SELECT COUNT(*) FROM users WHERE role = 'admin'").Scan(&adminCount); adminCount == 0 {
 		DB.Exec("UPDATE users SET role = 'admin' WHERE id = (SELECT id FROM users ORDER BY created_at ASC LIMIT 1)")

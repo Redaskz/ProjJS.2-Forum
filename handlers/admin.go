@@ -13,7 +13,7 @@ func ShowAdmin(w http.ResponseWriter, r *http.Request) {
 
 	users, err := database.GetAllUsers()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serveInternalError(w)
 		return
 	}
 
@@ -55,7 +55,7 @@ func ChangeUserRole(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := database.UpdateUserRole(targetID, role); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serveInternalError(w)
 		return
 	}
 

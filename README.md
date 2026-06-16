@@ -1,122 +1,125 @@
-# ForumFoot — Projet Go B1
+# SportTalk — Forum Web
 
-Forum web complet en Go pur + SQLite, inspiré de l'univers football / Coupe du Monde 2026.
+Forum de discussion sportif développé en Go avec SQLite, sans aucun framework.
+
+## Fonctionnalités
+
+- **Posts** : création avec image, association à une ou plusieurs catégories, modification, suppression
+- **Commentaires** : ajout, modification, suppression sur chaque post
+- **Votes** : like / dislike sur les posts et les commentaires (visible sans compte)
+- **Filtrage** : par catégorie, mes posts, posts aimés
+- **Authentification** : inscription, connexion, déconnexion — 1 session max par utilisateur, expiration 24 h
+- **Profil** : changement de mot de passe, photo de profil
+- **Rôles** : guest · user · moderator · admin
+  - Les modérateurs peuvent supprimer n'importe quel post ou commentaire
+  - L'admin gère les rôles depuis le panneau `/admin`
+  - Le premier compte inscrit devient automatiquement admin
+- **Calendrier** : page `/calendrier` avec tous les matchs de la FIFA World Cup 2026
+
+## Stack technique
+
+| Couche          | Technologie                                  |
+|-----------------|----------------------------------------------|
+| Backend         | Go — `net/http`, `html/template`             |
+| Base de données | SQLite via `go-sqlite3` (CGO requis)         |
+| Sécurité        | bcrypt pour les mots de passe                |
+| IDs             | UUID v4 via `google/uuid`                    |
+| Frontend        | HTML / CSS pur — zéro framework              |
+| Sessions        | Cookie HttpOnly, 1 session max / utilisateur |
+| Conteneur       | Docker + Docker Compose                      |
 
 ## Prérequis
 
-| Outil | Version minimale | Notes |
-|-------|-----------------|-------|
-| Go | 1.21 | `CGO_ENABLED=1` obligatoire |
-| GCC | Toute version récente | Requis pour go-sqlite3 (CGO) |
-| Docker + Docker Compose | 24+ | Pour le lancement conteneurisé |
+- Go 1.21+
+- GCC (`CGO_ENABLED=1` requis par go-sqlite3)  
+  → Windows : installer [TDM-GCC](https://jmeubank.github.io/tdm-gcc/) ou MinGW-w64
+- Docker (optionnel)
 
-> **Windows** : installer [TDM-GCC](https://jmeubank.github.io/tdm-gcc/) ou MinGW-w64 pour avoir GCC.
-
-## Lancement avec Docker (recommandé)
+## Lancer avec Docker (recommandé)
 
 ```bash
 docker compose up --build
 ```
 
-Accès : [http://localhost:8080](http://localhost:8080)
+L'application est accessible sur [http://localhost:8080](http://localhost:8080).  
+La base de données et les uploads sont persistés dans des volumes locaux.
 
-Aucune configuration manuelle requise. La base de données SQLite et les uploads sont persistés dans des volumes Docker.
-
-## Lancement sans Docker (développement)
+## Lancer en local
 
 ```bash
-# 1. Télécharger les dépendances
 go mod tidy
-
-# 2. Compiler et lancer (CGO obligatoire)
 CGO_ENABLED=1 go run .
 ```
 
-Accès : [http://localhost:8080](http://localhost:8080)
-
 La base de données `forum.db` est créée automatiquement au premier lancement.
 
-## Variables d'environnement
+## Lancer les tests
 
-Aucune variable d'environnement obligatoire. Toute la configuration est dans le code.
-
-| Variable | Valeur par défaut | Description |
-|----------|------------------|-------------|
-| `DB_PATH` | `./forum.db` | Chemin de la base SQLite |
+```bash
+CGO_ENABLED=1 go test ./...
+```
 
 ## Structure du projet
 
 ```
-forum/
-├── main.go                  # Routing HTTP, middleware logging
-├── schema.sql               # Schéma BDD SQLite + catégories par défaut
-├── Dockerfile               # Build multi-stage (builder + runtime alpine)
-├── docker-compose.yml       # Orchestration Docker
-├── go.mod / go.sum          # Dépendances Go
-│
-├── database/                # Couche d'accès aux données
-│   ├── database.go          # Initialisation SQLite + migration
-│   ├── users.go             # CRUD utilisateurs
-│   ├── sessions.go          # Gestion sessions
-│   ├── posts.go             # CRUD posts + filtres
-│   ├── comments.go          # CRUD commentaires
-│   ├── likes.go             # Système like/dislike
-│   └── categories.go        # Catégories
-│
-├── handlers/                # Handlers HTTP (logique métier)
+.
+├── main.go                  # Routeur HTTP + middleware de logging
+├── schema.sql               # Schéma SQLite + données initiales (catégories)
+├── Dockerfile               # Build multi-stage (builder Go + runtime alpine)
+├── Docker compose.yml
+├── database/
+│   ├── database.go          # Initialisation + migrations silencieuses
+│   ├── users.go
+│   ├── posts.go
+│   ├── comments.go
+│   ├── likes.go
+│   ├── sessions.go
+│   ├── testsetup_test.go    # Helpers partagés pour les tests
+│   ├── session_test.go
+│   └── likes_test.go
+├── handlers/
 │   ├── auth.go              # Inscription / connexion / déconnexion
-│   ├── posts.go             # Posts (liste, détail, création, modification, suppression)
-│   ├── comments.go          # Commentaires
-│   ├── likes.go             # Votes
-│   └── profile.go           # Profil utilisateur (photo, mot de passe)
-│
-├── middleware/              # Middlewares
-│   └── auth.go              # RequireAuth + WithUser (session → contexte)
-│
-├── models/                  # Structs de données
+│   ├── posts.go
+│   ├── comments.go
+│   ├── profile.go
+│   ├── admin.go
+│   ├── calendar.go
+│   └── helpers.go           # serveInternalError (page 500 HTML)
+├── middleware/
+│   └── auth.go              # WithUser · RequireAuth · RequireModerator · RequireAdmin
+├── models/
 │   ├── user.go
-│   ├── session.go
 │   ├── post.go
 │   ├── comment.go
-│   └── category.go
-│
-├── utils/                   # Utilitaires
-│   └── uuid.go              # Génération UUID
-│
-├── templates/               # Templates HTML (Go html/template)
-│   ├── index.html           # Page d'accueil (3 colonnes)
-│   ├── post.html            # Détail d'un post
+│   └── like.go
+├── utils/
+│   ├── uuid.go
+│   └── uuid_test.go
+├── templates/
+│   ├── index.html           # Accueil — 3 colonnes (sidebar / feed / calendrier)
+│   ├── post.html            # Détail d'un post + commentaires
 │   ├── create_post.html     # Formulaire de création
-│   ├── login.html           # Connexion
-│   ├── register.html        # Inscription
-│   ├── profile.html         # Profil utilisateur
-│   ├── 404.html             # Page introuvable
-│   └── 500.html             # Erreur serveur
-│
-├── static/                  # Fichiers statiques
-│   └── style.css            # CSS pur (pas de framework)
-│
-└── uploads/                 # Images uploadées (créé automatiquement)
+│   ├── login.html
+│   ├── register.html
+│   ├── profile.html
+│   ├── admin.html           # Panneau d'administration des rôles
+│   ├── calendrier.html      # FIFA World Cup 2026 — 48 matchs
+│   ├── 404.html
+│   └── 500.html
+└── static/
+    └── style.css            # Thème dark SportTalk (CSS pur)
 ```
 
-## Fonctionnalités
+## Règles techniques respectées
 
-- Inscription / Connexion / Déconnexion (bcrypt, session cookie HttpOnly)
-- Session unique par utilisateur, expiration 24h
-- Création / modification / suppression de posts (auteur uniquement)
-- Commentaires avec modification et suppression
-- Like / dislike sur posts et commentaires (toggle, visible en guest)
-- Catégories multi-sélection et filtres (par catégorie, mes posts, aimés)
-- Upload d'image dans les posts (JPEG/PNG/GIF/WebP, 20 Mo max)
-- Page profil : changement de mot de passe + photo de profil
-- Pages d'erreur 404 et 500 personnalisées
-- Layout responsive 3 colonnes (matchs WC2026, feed, actualités foot)
-
-## Technologies
-
-- **Langage :** Go 1.21 (pas de framework HTTP)
-- **Base de données :** SQLite3 via `github.com/mattn/go-sqlite3` (CGO)
-- **Hashage :** `golang.org/x/crypto/bcrypt`
-- **UUID :** `github.com/google/uuid`
-- **Templates :** `html/template` (stdlib Go)
-- **Frontend :** HTML/CSS pur (pas de React, Bootstrap ou autre framework)
+| Exigence | Statut |
+|----------|--------|
+| Langage Go uniquement, pas de framework backend | ✅ |
+| Base de données SQLite uniquement | ✅ |
+| Frontend HTML/CSS pur, pas de React/Bootstrap | ✅ |
+| Bibliothèques autorisées : sqlite3, bcrypt, uuid | ✅ |
+| `CGO_ENABLED=1` | ✅ |
+| Erreurs HTTP 404 et 500 avec page HTML dédiée | ✅ |
+| Sessions : cookie HttpOnly, expiration 24 h, 1 max par user | ✅ |
+| Conteneurisation Docker | ✅ |
+| Tests unitaires | ✅ |

@@ -20,7 +20,7 @@ func ShowProfile(w http.ResponseWriter, r *http.Request) {
 
 	fullUser, err := database.GetUserByID(user.ID)
 	if err != nil || fullUser == nil {
-		http.Error(w, "Erreur", http.StatusInternalServerError)
+		serveInternalError(w)
 		return
 	}
 
@@ -48,7 +48,6 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/profile?error=champs_vides", http.StatusSeeOther)
 		return
 	}
-
 	if len(newPass) < 6 {
 		http.Redirect(w, r, "/profile?error=mot_de_passe_trop_court", http.StatusSeeOther)
 		return
