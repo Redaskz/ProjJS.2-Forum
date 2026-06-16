@@ -12,7 +12,20 @@
   <a href="/" class="header-logo">Sport<span>Talk</span></a>
   <nav class="header-nav">
     <a href="/">← Accueil</a>
-    <a href="/logout" class="btn btn-ghost">Déconnexion</a>
+    <details class="user-dropdown">
+      <summary>
+        <div class="header-avatar">
+          {{if .User.ProfilePhoto}}<img src="/uploads/{{.User.ProfilePhoto}}" alt="">{{else}}{{slice .User.Username 0 1}}{{end}}
+        </div>
+        {{.User.Username}}
+      </summary>
+      <div class="dropdown-menu">
+        <a href="/profile">Mon profil</a>
+        <a href="/post/create">Nouveau post</a>
+        <div class="dropdown-divider"></div>
+        <a href="/logout" class="danger">Déconnexion</a>
+      </div>
+    </details>
   </nav>
 </header>
 

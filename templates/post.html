@@ -12,9 +12,20 @@
   <a href="/" class="header-logo">Sport<span>Talk</span></a>
   <nav class="header-nav">
     {{if .User}}
-      <a href="/profile" style="font-size:0.875rem;font-weight:600;color:var(--text-dim)">{{.User.Username}}</a>
-      <a href="/post/create" class="btn btn-primary">+ Nouveau post</a>
-      <a href="/logout" class="btn btn-ghost">Déconnexion</a>
+      <details class="user-dropdown">
+        <summary>
+          <div class="header-avatar">
+            {{if .User.ProfilePhoto}}<img src="/uploads/{{.User.ProfilePhoto}}" alt="">{{else}}{{slice .User.Username 0 1}}{{end}}
+          </div>
+          {{.User.Username}}
+        </summary>
+        <div class="dropdown-menu">
+          <a href="/profile">Mon profil</a>
+          <a href="/post/create">Nouveau post</a>
+          <div class="dropdown-divider"></div>
+          <a href="/logout" class="danger">Déconnexion</a>
+        </div>
+      </details>
     {{else}}
       <a href="/login" class="btn btn-ghost">Connexion</a>
       <a href="/register" class="btn btn-primary">S'inscrire</a>
@@ -40,7 +51,16 @@
       <div class="sidebar-title">Catégories</div>
       <ul class="sidebar-links">
         {{range .Categories}}
-        <li><a href="/?filter=category&id={{.ID}}"><span class="cat-dot"></span>{{.Name}}</a></li>
+        <li>
+          <a href="/?filter=category&id={{.ID}}">
+            <span class="cat-dot"></span>{{.Name}}
+            <span class="cat-icon">
+              {{if eq .Name "Général"}}<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>{{end}}
+              {{if eq .Name "Humour"}}<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>{{end}}
+              {{if eq .Name "Sport"}}<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>{{end}}
+            </span>
+          </a>
+        </li>
         {{end}}
       </ul>
     </div>
@@ -52,6 +72,9 @@
       <div class="post-detail-body">
 
         <div class="post-meta" style="margin-bottom:0.75rem">
+          <div class="post-author-avatar">
+            {{if .Post.AuthorPhoto}}<img src="/uploads/{{.Post.AuthorPhoto}}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">{{else}}{{slice .Post.Username 0 1}}{{end}}
+          </div>
           <span class="post-author">{{.Post.Username}}</span>
           <span class="post-sep">·</span>
           <span class="post-date">{{.Post.CreatedAt.Format "02 Jan 2006 à 15:04"}}</span>
@@ -78,7 +101,7 @@
               <input type="hidden" name="target_type" value="post">
               <input type="hidden" name="value" value="1">
               <button type="submit" class="vote-btn like {{if eq .Post.UserVote 1}}active-like{{end}}">
-                + {{.Post.Likes}}
+                +{{.Post.Likes}}
               </button>
             </form>
             <form action="/like" method="POST" style="display:inline">
@@ -86,12 +109,12 @@
               <input type="hidden" name="target_type" value="post">
               <input type="hidden" name="value" value="-1">
               <button type="submit" class="vote-btn dislike {{if eq .Post.UserVote -1}}active-dislike{{end}}">
-                – {{.Post.Dislikes}}
+                -{{.Post.Dislikes}}
               </button>
             </form>
             {{else}}
-            <span class="vote-btn like">+ {{.Post.Likes}}</span>
-            <span class="vote-btn dislike">– {{.Post.Dislikes}}</span>
+            <span class="vote-btn like">+{{.Post.Likes}}</span>
+            <span class="vote-btn dislike">-{{.Post.Dislikes}}</span>
             {{end}}
           </div>
 
@@ -148,7 +171,7 @@
                 <input type="hidden" name="target_type" value="comment">
                 <input type="hidden" name="value" value="1">
                 <button type="submit" class="vote-btn like {{if eq .UserVote 1}}active-like{{end}}">
-                  + {{.Likes}}
+                  +{{.Likes}}
                 </button>
               </form>
               <form action="/like" method="POST" style="display:inline">
@@ -156,12 +179,12 @@
                 <input type="hidden" name="target_type" value="comment">
                 <input type="hidden" name="value" value="-1">
                 <button type="submit" class="vote-btn dislike {{if eq .UserVote -1}}active-dislike{{end}}">
-                  – {{.Dislikes}}
+                  -{{.Dislikes}}
                 </button>
               </form>
               {{else}}
-              <span class="vote-btn like">+ {{.Likes}}</span>
-              <span class="vote-btn dislike">– {{.Dislikes}}</span>
+              <span class="vote-btn like">+{{.Likes}}</span>
+              <span class="vote-btn dislike">-{{.Dislikes}}</span>
               {{end}}
             </div>
 

@@ -32,11 +32,13 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Image (optionnel)</label>
-        <div class="file-input-wrap">
-          <input type="file" name="image" accept="image/jpeg,image/png,image/gif">
-          <div class="file-input-label">📷 Cliquer pour ajouter une image</div>
-        </div>
+        <label class="form-label" for="post-img">Image (optionnel)</label>
+        <input type="file" id="post-img" name="image"
+               accept="image/jpeg,image/png,image/gif,image/webp"
+               class="form-control"
+               style="padding:8px 12px;cursor:pointer"
+               onchange="document.getElementById('img-feedback').textContent = this.files.length ? 'Fichier sélectionné : ' + this.files[0].name : 'Aucun fichier'">
+        <div id="img-feedback" style="font-size:0.75rem;color:var(--text-mute);margin-top:4px">Aucun fichier — JPG, PNG, GIF, WebP (20 Mo max)</div>
       </div>
 
       <div class="form-group">
