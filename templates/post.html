@@ -12,11 +12,11 @@
   <a href="/" class="header-logo">Sport<span>Talk</span></a>
   <nav class="header-nav">
     {{if .User}}
-      <span style="font-size:0.8rem;color:var(--text-mute)">Bonjour, <strong style="color:var(--green)">{{.User.Username}}</strong></span>
+      <a href="/profile" style="font-size:0.875rem;font-weight:600;color:var(--text-dim)">{{.User.Username}}</a>
       <a href="/post/create" class="btn btn-primary">+ Nouveau post</a>
       <a href="/logout" class="btn btn-ghost">Déconnexion</a>
     {{else}}
-      <a href="/login">Connexion</a>
+      <a href="/login" class="btn btn-ghost">Connexion</a>
       <a href="/register" class="btn btn-primary">S'inscrire</a>
     {{end}}
   </nav>
@@ -28,10 +28,11 @@
     <div class="sidebar-section">
       <div class="sidebar-title">Navigation</div>
       <ul class="sidebar-links">
-        <li><a href="/">🏠 Tous les posts</a></li>
+        <li><a href="/">Tous les posts</a></li>
         {{if .User}}
-        <li><a href="/?filter=myposts">📌 Mes posts</a></li>
-        <li><a href="/?filter=liked">👍 Posts aimés</a></li>
+        <li><a href="/?filter=myposts">Mes posts</a></li>
+        <li><a href="/?filter=liked">Posts aimés</a></li>
+        <li><a href="/profile">Mon profil</a></li>
         {{end}}
       </ul>
     </div>
@@ -64,7 +65,7 @@
         <h1 class="post-detail-title">{{.Post.Title}}</h1>
 
         {{if .Post.ImagePath}}
-        <img src="/uploads/{{.Post.ImagePath}}" alt="Image du post" style="width:100%;max-height:400px;object-fit:cover;border-radius:8px;margin-bottom:1.25rem">
+        <img src="/uploads/{{.Post.ImagePath}}" alt="Image du post" style="width:100%;height:auto;display:block;border-radius:8px;margin-bottom:1.25rem">
         {{end}}
 
         <p class="post-detail-content">{{.Post.Content}}</p>
@@ -77,7 +78,7 @@
               <input type="hidden" name="target_type" value="post">
               <input type="hidden" name="value" value="1">
               <button type="submit" class="vote-btn like {{if eq .Post.UserVote 1}}active-like{{end}}">
-                👍 {{.Post.Likes}}
+                + {{.Post.Likes}}
               </button>
             </form>
             <form action="/like" method="POST" style="display:inline">
@@ -85,12 +86,12 @@
               <input type="hidden" name="target_type" value="post">
               <input type="hidden" name="value" value="-1">
               <button type="submit" class="vote-btn dislike {{if eq .Post.UserVote -1}}active-dislike{{end}}">
-                👎 {{.Post.Dislikes}}
+                – {{.Post.Dislikes}}
               </button>
             </form>
             {{else}}
-            <span class="vote-btn like">👍 {{.Post.Likes}}</span>
-            <span class="vote-btn dislike">👎 {{.Post.Dislikes}}</span>
+            <span class="vote-btn like">+ {{.Post.Likes}}</span>
+            <span class="vote-btn dislike">– {{.Post.Dislikes}}</span>
             {{end}}
           </div>
 
@@ -128,7 +129,7 @@
     </article>
 
     <section class="comments-section">
-      <div class="comments-title">💬 Commentaires ({{len .Comments}})</div>
+      <div class="comments-title">Commentaires ({{len .Comments}})</div>
 
       {{if .Comments}}
         {{range .Comments}}
@@ -147,7 +148,7 @@
                 <input type="hidden" name="target_type" value="comment">
                 <input type="hidden" name="value" value="1">
                 <button type="submit" class="vote-btn like {{if eq .UserVote 1}}active-like{{end}}">
-                  👍 {{.Likes}}
+                  + {{.Likes}}
                 </button>
               </form>
               <form action="/like" method="POST" style="display:inline">
@@ -155,12 +156,12 @@
                 <input type="hidden" name="target_type" value="comment">
                 <input type="hidden" name="value" value="-1">
                 <button type="submit" class="vote-btn dislike {{if eq .UserVote -1}}active-dislike{{end}}">
-                  👎 {{.Dislikes}}
+                  – {{.Dislikes}}
                 </button>
               </form>
               {{else}}
-              <span class="vote-btn like">👍 {{.Likes}}</span>
-              <span class="vote-btn dislike">👎 {{.Dislikes}}</span>
+              <span class="vote-btn like">+ {{.Likes}}</span>
+              <span class="vote-btn dislike">– {{.Dislikes}}</span>
               {{end}}
             </div>
 
