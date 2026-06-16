@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"forum/database"
+	"html/template"
 	"net/http"
 	"time"
 
@@ -10,9 +11,9 @@ import (
 
 // ShowRegister affiche le formulaire d'inscription.
 func ShowRegister(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "templates/register.html")
+	tmpl := template.Must(template.ParseFiles("templates/register.html"))
+	tmpl.Execute(w, struct{ Error string }{Error: r.URL.Query().Get("error")})
 }
-
 
 // Register traite la soumission du formulaire d'inscription.
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -36,11 +37,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	// Vérifier que l'email n'est pas déjà utilisé
 	existingUser, err := database.GetUserByEmail(email)
 	if err != nil {
-		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+		http.Redirect(w, r, "/register?error=erreur_serveur", http.StatusSeeOther)
 		return
 	}
 	if existingUser != nil {
-		http.Error(w, "Cet email est déjà utilisé", http.StatusBadRequest)
+		http.Redirect(w, r, "/register?error=email_deja_utilise", http.StatusSeeOther)
 		return
 	}
 
@@ -64,7 +65,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 // ShowLogin affiche le formulaire de connexion.
 func ShowLogin(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "templates/login.html")
+	tmpl := template.Must(template.ParseFiles("templates/login.html"))
+	tmpl.Execute(w, struct{ Error string }{Error: r.URL.Query().Get("error")})
 }
 
 // Login traite la soumission du formulaire de connexion.
@@ -94,14 +96,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// Si le user n'existe pas ou mot de passe incorrect → même message (sécurité)
 	if user == nil {
-		http.Error(w, "Email ou mot de passe incorrect", http.StatusUnauthorized)
+		http.Redirect(w, r, "/login?error=identifiants_incorrects", http.StatusSeeOther)
 		return
 	}
 
 	// Comparer le mot de passe avec le hash bcrypt
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
-		http.Error(w, "Email ou mot de passe incorrect", http.StatusUnauthorized)
+		http.Redirect(w, r, "/login?error=identifiants_incorrects", http.StatusSeeOther)
 		return
 	}
 

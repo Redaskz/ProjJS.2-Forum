@@ -1,39 +1,53 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription — ForumFoot</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscription — SportTalk</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+
 <div class="auth-page">
-    <div class="auth-box">
-        <a href="/" class="auth-logo" style="display:block">⚽ ForumFoot</a>
-        <div class="auth-sub">Rejoins la communauté football !</div>
+  <div class="auth-card">
+    <div class="auth-card-accent"></div>
+    <div class="auth-card-body">
 
-        <form action="/register/submit" method="POST" class="auth-form">
-            <div class="form-group">
-                <label class="form-label">Nom d'utilisateur</label>
-                <input type="text" name="username" placeholder="Ton pseudo foot" required autofocus>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Adresse email</label>
-                <input type="email" name="email" placeholder="email@exemple.com" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Mot de passe</label>
-                <input type="password" name="password" placeholder="Min. 6 caractères" required minlength="6">
-            </div>
-            <button type="submit" class="auth-btn">Créer mon compte</button>
-        </form>
+      <div class="auth-logo">Sport<span>Talk</span></div>
+      <p class="auth-subtitle">Crée ton compte et rejoins la communauté</p>
 
-        <div class="auth-divider">ou</div>
+      {{if eq .Error "email_deja_utilise"}}
+      <div class="alert alert-error">Cette adresse email est déjà utilisée.</div>
+      {{end}}
+      {{if eq .Error "erreur_serveur"}}
+      <div class="alert alert-error">Une erreur est survenue. Réessaie.</div>
+      {{end}}
 
-        <div class="auth-footer">
-            Déjà inscrit ? <a href="/login">Se connecter</a>
+      <form action="/register/submit" method="POST">
+        <div class="form-group">
+          <label class="form-label">Adresse email</label>
+          <input type="email" name="email" class="form-control" placeholder="ton@email.com" required autofocus>
         </div>
+        <div class="form-group">
+          <label class="form-label">Nom d'utilisateur</label>
+          <input type="text" name="username" class="form-control" placeholder="Ex : LeBossDesFoot" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mot de passe</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem">
+          Créer mon compte
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Déjà un compte ? <a href="/login">Se connecter</a>
+      </div>
+
     </div>
+  </div>
 </div>
+
 </body>
 </html>

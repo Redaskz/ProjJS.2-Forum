@@ -1,274 +1,150 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forum Foot</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SportTalk — Forum</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
 <header class="header">
-    <div class="header-stripe"></div>
-    <div class="header-inner">
-        <a href="/" class="logo">⚽ ForumFoot</a>
-        <nav class="header-nav">
-            <a href="/" class="active">Accueil</a>
-            {{if .User}}<a href="/?filter=myposts">Mes posts</a>{{end}}
-            {{if .User}}<a href="/?filter=liked">Aimés</a>{{end}}
-        </nav>
-        <div class="header-auth">
-            {{if .User}}
-                <a href="/profile" class="user-chip">
-                    <div class="avatar">
-                        {{if .User.ProfilePhoto}}
-                            <img src="/uploads/{{.User.ProfilePhoto}}" alt="">
-                        {{else}}
-                            {{slice .User.Username 0 1}}
-                        {{end}}
-                    </div>
-                    {{.User.Username}}
-                </a>
-                <a href="/post/create" class="btn btn-primary">+ Nouveau post</a>
-                <a href="/logout" class="btn btn-ghost">Déconnexion</a>
-            {{else}}
-                <a href="/login"    class="btn btn-ghost">Connexion</a>
-                <a href="/register" class="btn btn-primary">S'inscrire</a>
-            {{end}}
-        </div>
-    </div>
+  <a href="/" class="header-logo">Sport<span>Talk</span></a>
+  <nav class="header-nav">
+    {{if .User}}
+      <span style="font-size:0.8rem;color:var(--text-mute)">Bonjour, <strong style="color:var(--green)">{{.User.Username}}</strong></span>
+      <a href="/post/create" class="btn btn-primary">+ Nouveau post</a>
+      <a href="/logout" class="btn btn-ghost">Déconnexion</a>
+    {{else}}
+      <a href="/login">Connexion</a>
+      <a href="/register" class="btn btn-primary">S'inscrire</a>
+    {{end}}
+  </nav>
 </header>
 
-<div class="page-body">
+<div class="layout">
 
-    <!-- ── GAUCHE : MATCHS CdM 2026 ── -->
-    <aside class="sidebar-left">
-        <div class="card">
-            <div class="card-header">⚽ Coupe du Monde 2026</div>
-
-            <div class="match-group-label">Terminés</div>
-
-            <div class="match-row">
-                <div class="match-top">
-                    <span class="badge-time done">Terminé</span>
-                    <span class="match-grp-tag">Gr. A · J1</span>
-                </div>
-                <div class="match-teams">
-                    <div class="match-team"><span class="team-name">🇧🇷 Brésil</span><span class="score-val win">4</span></div>
-                    <div class="match-team"><span class="team-name">🇧🇴 Bolivie</span><span class="score-val loss">0</span></div>
-                </div>
-            </div>
-
-            <div class="match-row">
-                <div class="match-top">
-                    <span class="badge-time done">Terminé</span>
-                    <span class="match-grp-tag">Gr. B · J1</span>
-                </div>
-                <div class="match-teams">
-                    <div class="match-team"><span class="team-name">🇩🇪 Allemagne</span><span class="score-val win">3</span></div>
-                    <div class="match-team"><span class="team-name">🇨🇱 Chili</span><span class="score-val loss">1</span></div>
-                </div>
-            </div>
-
-            <div class="match-row">
-                <div class="match-top">
-                    <span class="badge-time done">Terminé</span>
-                    <span class="match-grp-tag">Gr. C · J1</span>
-                </div>
-                <div class="match-teams">
-                    <div class="match-team"><span class="team-name">🇦🇷 Argentine</span><span class="score-val win">2</span></div>
-                    <div class="match-team"><span class="team-name">🇲🇦 Maroc</span><span class="score-val loss">0</span></div>
-                </div>
-            </div>
-
-            <div class="match-group-label" style="color:#dc2626">🔴 En direct</div>
-
-            <div class="match-row">
-                <div class="match-top">
-                    <span class="badge-time live">LIVE 58'</span>
-                    <span class="match-grp-tag">Gr. H · J1</span>
-                </div>
-                <div class="match-teams">
-                    <div class="match-team"><span class="team-name">🇪🇸 Espagne</span><span class="score-val win">2</span></div>
-                    <div class="match-team"><span class="team-name">🇨🇻 Cap-Vert</span><span class="score-val loss">0</span></div>
-                </div>
-            </div>
-
-            <div class="match-row">
-                <div class="match-top">
-                    <span class="badge-time live">LIVE 31'</span>
-                    <span class="match-grp-tag">Gr. G · J1</span>
-                </div>
-                <div class="match-teams">
-                    <div class="match-team"><span class="team-name">🇧🇪 Belgique</span><span class="score-val">1</span></div>
-                    <div class="match-team"><span class="team-name">🇪🇬 Égypte</span><span class="score-val">1</span></div>
-                </div>
-            </div>
-
-            <div class="match-group-label">À venir</div>
-
-            <div class="match-row">
-                <div class="match-top">
-                    <span class="badge-time">Demain 21:00</span>
-                    <span class="match-grp-tag">Gr. I · J1</span>
-                </div>
-                <div class="match-teams">
-                    <div class="match-team"><span class="team-name">🇫🇷 France</span><span class="score-val pending">–</span></div>
-                    <div class="match-team"><span class="team-name">🇸🇳 Sénégal</span><span class="score-val pending">–</span></div>
-                </div>
-            </div>
-
-            <div class="match-row">
-                <div class="match-top">
-                    <span class="badge-time">16 Juin 18:00</span>
-                    <span class="match-grp-tag">Gr. D · J1</span>
-                </div>
-                <div class="match-teams">
-                    <div class="match-team"><span class="team-name">🇵🇹 Portugal</span><span class="score-val pending">–</span></div>
-                    <div class="match-team"><span class="team-name">🇯🇵 Japon</span><span class="score-val pending">–</span></div>
-                </div>
-            </div>
-
-            <div class="match-row">
-                <div class="match-top">
-                    <span class="badge-time">17 Juin 21:00</span>
-                    <span class="match-grp-tag">Gr. E · J1</span>
-                </div>
-                <div class="match-teams">
-                    <div class="match-team"><span class="team-name">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre</span><span class="score-val pending">–</span></div>
-                    <div class="match-team"><span class="team-name">🇺🇸 États-Unis</span><span class="score-val pending">–</span></div>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ── CENTRE : POSTS ── -->
-    <main class="feed">
-        <div class="feed-topbar">
-            <div class="tabs">
-                <a href="/" class="tab active">Tous</a>
-                {{if .User}}
-                    <a href="/?filter=myposts" class="tab">Mes posts</a>
-                    <a href="/?filter=liked"   class="tab">Aimés</a>
-                {{end}}
-                {{range .Categories}}
-                    <a href="/?filter=category&id={{.ID}}" class="tab">{{.Name}}</a>
-                {{end}}
-            </div>
-            {{if .User}}
-                <a href="/post/create" class="btn btn-primary" style="flex-shrink:0">+ Post</a>
-            {{end}}
-        </div>
-
-        {{if .Posts}}
-            {{range .Posts}}
-            <div class="post-card">
-                <div class="post-head">
-                    <div class="avatar">
-                        {{slice .Username 0 1}}
-                    </div>
-                    <div class="post-meta-info">
-                        <div class="post-author">{{.Username}}</div>
-                        <div class="post-date">{{.CreatedAt.Format "02 Jan 2006 à 15:04"}}</div>
-                    </div>
-                    <div class="tags">
-                        {{range .Categories}}<span class="tag">{{.Name}}</span>{{end}}
-                    </div>
-                </div>
-
-                <a href="/post/?id={{.ID}}" class="post-title">{{.Title}}</a>
-                <div class="post-excerpt">{{.Content}}</div>
-
-                <div class="post-footer">
-                    <div class="vote-row">
-                        {{if $.User}}
-                        <form method="POST" action="/like" style="display:inline">
-                            <input type="hidden" name="target_id"   value="{{.ID}}">
-                            <input type="hidden" name="target_type" value="post">
-                            <input type="hidden" name="value"       value="1">
-                            <button type="submit" class="vote-btn {{if eq .UserVote 1}}liked{{end}}">👍 {{.Likes}}</button>
-                        </form>
-                        <form method="POST" action="/like" style="display:inline">
-                            <input type="hidden" name="target_id"   value="{{.ID}}">
-                            <input type="hidden" name="target_type" value="post">
-                            <input type="hidden" name="value"       value="-1">
-                            <button type="submit" class="vote-btn {{if eq .UserVote -1}}disliked{{end}}">👎 {{.Dislikes}}</button>
-                        </form>
-                        {{else}}
-                        <a href="/login" class="vote-btn">👍 {{.Likes}}</a>
-                        <a href="/login" class="vote-btn">👎 {{.Dislikes}}</a>
-                        {{end}}
-                    </div>
-                    <a href="/post/?id={{.ID}}" class="see-link">Lire la discussion →</a>
-                </div>
-            </div>
-            {{end}}
-        {{else}}
-            <div class="empty-state">
-                <div class="empty-icon">💬</div>
-                <p style="font-weight:700;margin-bottom:6px">Aucun post pour le moment</p>
-                <p style="font-size:0.83rem">Sois le premier à lancer une discussion !</p>
-                {{if .User}}
-                    <a href="/post/create" class="btn btn-primary" style="margin-top:1.25rem">Créer le premier post</a>
-                {{else}}
-                    <a href="/register" class="btn btn-primary" style="margin-top:1.25rem">Rejoindre le forum</a>
-                {{end}}
-            </div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Navigation</div>
+      <ul class="sidebar-links">
+        <li><a href="/" {{if not .Filter}}class="active"{{end}}>🏠 Tous les posts</a></li>
+        {{if .User}}
+        <li><a href="/?filter=myposts" {{if eq .Filter "myposts"}}class="active"{{end}}>📌 Mes posts</a></li>
+        <li><a href="/?filter=liked" {{if eq .Filter "liked"}}class="active"{{end}}>👍 Posts aimés</a></li>
         {{end}}
-    </main>
+      </ul>
+    </div>
 
-    <!-- ── DROITE : ACTUALITÉS ── -->
-    <aside class="sidebar-right">
-        <div class="card">
-            <div class="card-header">📰 Actualités foot</div>
-            <div class="news-item">
-                <span class="news-badge nb-live">Live</span>
-                <div class="news-title">Espagne 2-0 Cap-Vert — Yamal auteur d'un doublé à la 58e</div>
-                <div class="news-src">RMC Sport · En direct</div>
-            </div>
-            <div class="news-item">
-                <span class="news-badge nb-result">Résultat</span>
-                <div class="news-title">Brésil 4-0 Bolivie — Vinicius Jr. intouchable à l'ouverture</div>
-                <div class="news-src">L'Équipe · il y a 2h</div>
-            </div>
-            <div class="news-item">
-                <span class="news-badge nb-actu">CdM 2026</span>
-                <div class="news-title">Mbappé : "Je veux gagner ce Mondial pour la France"</div>
-                <div class="news-src">Le Parisien · il y a 5h</div>
-            </div>
-            <div class="news-item">
-                <span class="news-badge nb-trans">Transfert</span>
-                <div class="news-title">Real Madrid : Haaland priorité absolue cet été</div>
-                <div class="news-src">Marca · il y a 8h</div>
-            </div>
-            <div class="news-item">
-                <span class="news-badge nb-actu">CdM 2026</span>
-                <div class="news-title">Ronaldo : "Ce Mondial sera mon dernier, je veux finir en beauté"</div>
-                <div class="news-src">Record · il y a 12h</div>
-            </div>
-            <div class="news-item">
-                <span class="news-badge nb-result">Résultat</span>
-                <div class="news-title">Argentine 2-0 Maroc — Messi décisif dès la 1re journée</div>
-                <div class="news-src">ESPN · il y a 14h</div>
-            </div>
-            <div class="news-item">
-                <span class="news-badge nb-trans">Transfert</span>
-                <div class="news-title">PSG : accord trouvé avec Osimhen, annonce imminente</div>
-                <div class="news-src">Foot Mercato · il y a 1j</div>
-            </div>
-        </div>
-
-        {{if not .User}}
-        <div class="card" style="padding:1.25rem">
-            <p style="font-weight:800;font-size:0.9rem;margin-bottom:6px">Rejoins la communauté 🔥</p>
-            <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Commente, vote et partage ton avis sur le foot.</p>
-            <div style="display:flex;flex-direction:column;gap:6px">
-                <a href="/register" class="btn btn-primary" style="justify-content:center">S'inscrire gratuitement</a>
-                <a href="/login"    class="btn btn-ghost"   style="justify-content:center">Se connecter</a>
-            </div>
-        </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Catégories</div>
+      <ul class="sidebar-links">
+        {{range .Categories}}
+        <li>
+          <a href="/?filter=category&id={{.ID}}" {{if eq $.FilterID .ID}}class="active"{{end}}>
+            <span class="cat-dot"></span>{{.Name}}
+          </a>
+        </li>
         {{end}}
-    </aside>
+      </ul>
+    </div>
+  </aside>
+
+  <main>
+    <div class="feed-header">
+      <h1 class="feed-title">
+        {{if eq .Filter "myposts"}}Mes posts
+        {{else if eq .Filter "liked"}}Posts aimés
+        {{else if eq .Filter "category"}}Catégorie
+        {{else}}Live Feed
+        {{end}}
+      </h1>
+      {{if .User}}
+      <a href="/post/create" class="btn btn-primary btn-sm">+ Nouveau post</a>
+      {{end}}
+    </div>
+
+    {{if .Posts}}
+      {{range .Posts}}
+      <article class="post-card">
+        <div class="post-card-accent"></div>
+        <div class="post-card-body">
+          <div class="post-meta">
+            <span class="post-author">{{.Username}}</span>
+            <span class="post-sep">·</span>
+            <span class="post-date">{{.CreatedAt.Format "02 Jan 2006"}}</span>
+            <div class="post-categories">
+              {{range .Categories}}
+              <span class="cat-badge">{{.Name}}</span>
+              {{end}}
+            </div>
+          </div>
+
+          <h2 class="post-title">
+            <a href="/post/?id={{.ID}}">{{.Title}}</a>
+          </h2>
+
+          {{if .ImagePath}}
+          <img src="/uploads/{{.ImagePath}}" alt="Image du post" class="post-image">
+          {{end}}
+
+          <p class="post-excerpt">{{.Content}}</p>
+
+          <div class="post-footer">
+            <div class="vote-group">
+              {{if $.User}}
+              <form action="/like" method="POST" style="display:inline">
+                <input type="hidden" name="target_id" value="{{.ID}}">
+                <input type="hidden" name="target_type" value="post">
+                <input type="hidden" name="value" value="1">
+                <button type="submit" class="vote-btn like {{if eq .UserVote 1}}active-like{{end}}">
+                  👍 {{.Likes}}
+                </button>
+              </form>
+              <form action="/like" method="POST" style="display:inline">
+                <input type="hidden" name="target_id" value="{{.ID}}">
+                <input type="hidden" name="target_type" value="post">
+                <input type="hidden" name="value" value="-1">
+                <button type="submit" class="vote-btn dislike {{if eq .UserVote -1}}active-dislike{{end}}">
+                  👎 {{.Dislikes}}
+                </button>
+              </form>
+              {{else}}
+              <span class="vote-btn like">👍 {{.Likes}}</span>
+              <span class="vote-btn dislike">👎 {{.Dislikes}}</span>
+              {{end}}
+            </div>
+
+            <a href="/post/?id={{.ID}}" class="post-comments-count">
+              💬 Voir les commentaires
+            </a>
+
+            {{if $.User}}
+              {{if eq $.User.ID .UserID}}
+              <div class="post-actions">
+                <a href="/post/update?id={{.ID}}" class="btn btn-ghost btn-sm">Modifier</a>
+                <form action="/post/delete" method="POST" style="display:inline">
+                  <input type="hidden" name="post_id" value="{{.ID}}">
+                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce post ?')">Supprimer</button>
+                </form>
+              </div>
+              {{end}}
+            {{end}}
+          </div>
+        </div>
+      </article>
+      {{end}}
+    {{else}}
+      <div class="empty-state">
+        <h2>Aucun post pour le moment</h2>
+        <p>Sois le premier à lancer le débat !</p>
+        {{if .User}}
+        <br>
+        <a href="/post/create" class="btn btn-primary">+ Créer un post</a>
+        {{end}}
+      </div>
+    {{end}}
+  </main>
 
 </div>
 </body>

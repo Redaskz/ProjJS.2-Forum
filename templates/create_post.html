@@ -1,77 +1,63 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nouveau post — ForumFoot</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouveau post — SportTalk</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
 <header class="header">
-    <div class="header-stripe"></div>
-    <div class="header-inner">
-        <a href="/" class="logo">⚽ ForumFoot</a>
-        <div class="header-auth">
-            {{if .User}}
-                <a href="/profile" class="user-chip">
-                    <div class="avatar">
-                        {{if .User.ProfilePhoto}}<img src="/uploads/{{.User.ProfilePhoto}}" alt="">{{else}}{{slice .User.Username 0 1}}{{end}}
-                    </div>
-                    {{.User.Username}}
-                </a>
-                <a href="/logout" class="btn btn-ghost">Déconnexion</a>
-            {{end}}
-        </div>
-    </div>
+  <a href="/" class="header-logo">Sport<span>Talk</span></a>
+  <nav class="header-nav">
+    <a href="/">← Retour</a>
+    <a href="/logout" class="btn btn-ghost">Déconnexion</a>
+  </nav>
 </header>
 
-<div class="create-page">
-    <div class="create-wrap">
-        <a href="/" class="back-link">← Retour</a>
+<div style="max-width:680px;margin:2rem auto;padding:0 1.5rem">
+  <div class="form-card">
+    <div class="form-title">Nouveau post</div>
+    <form action="/post/create/submit" method="POST" enctype="multipart/form-data">
 
-        <div class="create-box">
-            <div class="create-title">✍️ Créer une discussion</div>
+      <div class="form-group">
+        <label class="form-label">Titre *</label>
+        <input type="text" name="title" class="form-control" placeholder="Ex : PSG vs Real Madrid — Qui va gagner ?" required>
+      </div>
 
-            {{if eq .Error "format_non_supporte"}}
-            <div class="alert alert-error">Format non supporté. Utilise JPG, PNG, GIF ou WebP (20 Mo max).</div>
-            {{end}}
+      <div class="form-group">
+        <label class="form-label">Contenu *</label>
+        <textarea name="content" class="form-control" placeholder="Développe ton analyse, ton pronostic, ta réaction..." rows="6" required></textarea>
+      </div>
 
-            <form action="/post/create/submit" method="POST" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:1rem">
-
-                <div class="form-group">
-                    <label class="form-label">Titre</label>
-                    <input type="text" name="title" placeholder="De quoi veux-tu parler ?" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Contenu</label>
-                    <textarea name="content" placeholder="Développe ton sujet, partage ton avis..." required style="min-height:180px"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Image (optionnel)</label>
-                    <input type="file" name="image" accept="image/*">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Catégories</label>
-                    <div class="checkbox-group">
-                        {{range .Categories}}
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="categories" value="{{.ID}}">
-                            {{.Name}}
-                        </label>
-                        {{end}}
-                    </div>
-                </div>
-
-                <button type="submit" class="create-submit">Publier la discussion</button>
-
-            </form>
+      <div class="form-group">
+        <label class="form-label">Image (optionnel)</label>
+        <div class="file-input-wrap">
+          <input type="file" name="image" accept="image/jpeg,image/png,image/gif">
+          <div class="file-input-label">📷 Cliquer pour ajouter une image</div>
         </div>
-    </div>
-</div>
+      </div>
 
+      <div class="form-group">
+        <label class="form-label">Catégories *</label>
+        <div class="cat-checkboxes">
+          {{range .Categories}}
+          <label class="cat-check-label">
+            <input type="checkbox" name="categories" value="{{.ID}}">
+            {{.Name}}
+          </label>
+          {{end}}
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.75rem;margin-top:1.25rem">
+        <button type="submit" class="btn btn-primary">Publier</button>
+        <a href="/" class="btn btn-ghost">Annuler</a>
+      </div>
+
+    </form>
+  </div>
+</div>
 </body>
 </html>

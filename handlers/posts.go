@@ -67,10 +67,14 @@ func ListPosts(w http.ResponseWriter, r *http.Request) {
 		User       *models.User
 		Posts      []models.Post
 		Categories []models.Category
+		Filter     string
+		FilterID   string
 	}{
 		User:       currentUser,
 		Posts:      posts,
 		Categories: categories,
+		Filter:     filter,
+		FilterID:   r.URL.Query().Get("id"),
 	}
 
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
@@ -108,14 +112,18 @@ func ShowPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	categories, _ := database.GetAllCategories()
+
 	data := struct {
-		User     *models.User
-		Post     *models.Post
-		Comments []models.Comment
+		User       *models.User
+		Post       *models.Post
+		Comments   []models.Comment
+		Categories []models.Category
 	}{
-		User:     currentUser,
-		Post:     post,
-		Comments: comments,
+		User:       currentUser,
+		Post:       post,
+		Comments:   comments,
+		Categories: categories,
 	}
 
 	tmpl := template.Must(template.ParseFiles("templates/post.html"))
