@@ -123,3 +123,7 @@ CGO_ENABLED=1 go test ./...
 | Sessions : cookie HttpOnly, expiration 24 h, 1 max par user | ✅ |
 | Conteneurisation Docker | ✅ |
 | Tests unitaires | ✅ |
+
+
+
+LIEN NOTION : https://app.notion.com/p/Gestion-projet-FORUM-37c281a9554f8088856cf811ecbd02ad?source=copy_link
